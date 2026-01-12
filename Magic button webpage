@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Magic Button Page</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(120deg, #89f7fe, #66a6ff);
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: float 3s infinite ease-in-out;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background: #66a6ff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #89f7fe;
+            transform: scale(1.1);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>✨ Welcome ✨</h1>
+        <p>Click the magic button to change the background!</p>
+        <button onclick="changeColor()">Magic Button</button>
+    </div>
+
+    <script>
+        function changeColor() {
+            const colors = [
+                "linear-gradient(120deg, #f6d365, #fda085)",
+                "linear-gradient(120deg, #84fab0, #8fd3f4)",
+                "linear-gradient(120deg, #fccb90, #d57eeb)",
+                "linear-gradient(120deg, #a1c4fd, #c2e9fb)"
+            ];
+            document.body.style.background =
+                colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+
+</body>
+</html>
