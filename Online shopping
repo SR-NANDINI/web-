@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Online Shop</title>
+</head>
+<body>
+
+    <h1>🛍️ Welcome to Simple Online Shop</h1>
+    <hr>
+
+    <h2>Available Products</h2>
+
+    <table border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>Product</th>
+            <th>Description</th>
+            <th>Price</th>
+        </tr>
+
+        <tr>
+            <td>Coffee Mug</td>
+            <td>Ceramic mug for hot drinks</td>
+            <td>₹299</td>
+        </tr>
+
+        <tr>
+            <td>Notebook</td>
+            <td>200 pages ruled notebook</td>
+            <td>₹99</td>
+        </tr>
+
+        <tr>
+            <td>Headphones</td>
+            <td>Wired headphones with mic</td>
+            <td>₹799</td>
+        </tr>
+    </table>
+
+    <h2>📝 Place Your Order</h2>
+
+    <form>
+        <label>Name:</label><br>
+        <input type="text" placeholder="Enter your name"><br><br>
+
+        <label>Email:</label><br>
+        <input type="email" placeholder="Enter your email"><br><br>
+
+        <label>Select Product:</label><br>
+        <select>
+            <option>Coffee Mug</option>
+            <option>Notebook</option>
+            <option>Headphones</option>
+        </select><br><br>
+
+        <label>Quantity:</label><br>
+        <input type="number" min="1" max="10"><br><br>
+
+        <input type="submit" value="Order Now">
+        <input type="reset" value="Clear">
+    </form>
+
+    <hr>
+    <footer>
+        <p>© 2026 Simple Online Shop</p>
+    </footer>
+
+</body>
+</html>
