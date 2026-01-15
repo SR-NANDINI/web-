@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Music Playlist</title>
+</head>
+<body>
+
+    <h1>🎶 My Music Playlist</h1>
+    <p>Enjoy my favorite songs</p>
+    <hr>
+
+    <h2>🎧 Playlist</h2>
+    <ol>
+        <li>
+            Song 1 – Melody Song<br>
+            <audio controls>
+                <source src="song1.mp3" type="audio/mpeg">
+                Your browser does not support audio.
+            </audio>
+        </li>
+        <br>
+
+        <li>
+            Song 2 – Romantic Song<br>
+            <audio controls>
+                <source src="song2.mp3" type="audio/mpeg">
+            </audio>
+        </li>
+        <br>
+
+        <li>
+            Song 3 – Chill Beats<br>
+            <audio controls>
+                <source src="song3.mp3" type="audio/mpeg">
+            </audio>
+        </li>
+    </ol>
+
+    <h2>🎤 Favorite Artists</h2>
+    <ul>
+        <li>A.R. Rahman</li>
+        <li>Anirudh</li>
+        <li>Yuvan Shankar Raja</li>
+    </ul>
+
+    <p>
+        Visit my favorite music site:
+        <a href="https://www.spotify.com" target="_blank">Spotify</a>
+    </p>
+
+    <hr>
+    <footer>
+        <p>© 2026 Music Playlist Page</p>
+    </footer>
+
+</body>
+</html>
