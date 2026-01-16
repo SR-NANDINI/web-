@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Quiz</title>
+</head>
+<body>
+
+    <h1>🧠 Online Quiz</h1>
+    <p>Test your basic knowledge</p>
+    <hr>
+
+    <form>
+
+        <h3>1. What does HTML stand for?</h3>
+        <input type="radio" name="q1"> Hyper Text Markup Language<br>
+        <input type="radio" name="q1"> High Text Machine Language<br>
+        <input type="radio" name="q1"> Hyperlinks and Text Markup Language<br>
+
+        <h3>2. Which tag is used for paragraph?</h3>
+        <input type="radio" name="q2"> &lt;div&gt;<br>
+        <input type="radio" name="q2"> &lt;p&gt;<br>
+        <input type="radio" name="q2"> &lt;span&gt;<br>
+
+        <h3>3. HTML is a _____ language.</h3>
+        <input type="radio" name="q3"> Programming<br>
+        <input type="radio" name="q3"> Markup<br>
+        <input type="radio" name="q3"> Scripting<br>
+
+        <br><br>
+        <input type="submit" value="Submit Quiz">
+        <input type="reset" value="Reset Quiz">
+
+    </form>
+
+    <hr>
+    <footer>
+        <p>© 2026 Online Quiz Page</p>
+    </footer>
+
+</body>
+</html>
