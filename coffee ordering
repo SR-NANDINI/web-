@@ -1,61 +1,174 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Coffee Order Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5e6cc;
-        }
+<meta charset="UTF-8">
+<title>Coffee Order | Login</title>
 
-        .login-box {
-            width: 350px;
-            margin: 100px auto;
-            padding: 25px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px #999;
-            text-align: center;
-        }
+<style>
+    :root {
+        --coffee: #6f4e37;
+        --coffee-dark: #5a3d2b;
+        --bg: #f5e6cc;
+    }
 
-        h2 {
-            color: #6f4e37;
-        }
+    * {
+        box-sizing: border-box;
+        font-family: "Segoe UI", system-ui, sans-serif;
+    }
 
-        input[type="text"], input[type="password"] {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-        }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        input[type="submit"] {
-            width: 95%;
-            padding: 10px;
-            background-color: #6f4e37;
-            color: white;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    .login-box {
+        width: 380px;
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        text-align: center;
+    }
 
-        input[type="submit"]:hover {
-            background-color: #5a3d2b;
-        }
-    </style>
+    .logo {
+        font-size: 32px;
+        margin-bottom: 5px;
+    }
+
+    h2 {
+        margin: 5px 0 20px;
+        color: var(--coffee);
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: var(--coffee);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: var(--coffee-dark);
+    }
+
+    .error {
+        color: crimson;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .success {
+        color: green;
+        font-size: 14px;
+        margin-top: 15px;
+    }
+
+    footer {
+        margin-top: 15px;
+        font-size: 12px;
+        color: #777;
+    }
+</style>
 </head>
+
 <body>
 
-    <div class="login-box">
-        <h2>Coffee Order Login</h2>
+<div class="login-box">
+    <div class="logo">☕</div>
+    <h2>Coffee Order Login</h2>
 
-        <form action="order.html" method="post">
-            <input type="text" name="username" placeholder="Enter Username" required><br>
+    <div id="error" class="error"></div>
 
-            <input type="password" name="password" placeholder="Enter Password" required><br>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
 
-            <input type="submit" value="Login">
-        </form>
-    </div>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="success" class="success"></div>
+
+    <footer>Secure login • Coffee Lovers ☕</footer>
+</div>
+
+<script>
+/* =========================
+   SESSION CHECK
+========================= */
+if (localStorage.getItem("coffeeUser")) {
+    showLoggedInUser();
+}
+
+/* =========================
+   DOM ELEMENTS
+========================= */
+const form = document.getElementById("loginForm");
+const errorBox = document.getElementById("error");
+const successBox = document.getElementById("success");
+
+/* =========================
+   EVENTS
+========================= */
+form.addEventListener("submit", handleLogin);
+
+/* =========================
+   FUNCTIONS
+========================= */
+function handleLogin(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    errorBox.textContent = "";
+    successBox.textContent = "";
+
+    if (username.length < 3 || password.length < 4) {
+        errorBox.textContent = "Invalid username or password length";
+        return;
+    }
+
+    // Simulated authentication (backend-ready)
+    localStorage.setItem("coffeeUser", username);
+
+    showLoggedInUser();
+}
+
+function showLoggedInUser() {
+    const user = localStorage.getItem("coffeeUser");
+
+    document.querySelector(".login-box").innerHTML = `
+        <div class="logo">☕</div>
+        <h2>Welcome, ${user}</h2>
+        <p>You are successfully logged in.</p>
+        <button onclick="logout()">Logout</button>
+        <footer>Session active ✔</footer>
+    `;
+}
+
+function logout() {
+    localStorage.removeItem("coffeeUser");
+    location.reload();
+}
+</script>
 
 </body>
 </html>
