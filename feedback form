@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Feedback System</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        background: #fff;
+        width: 480px;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    p {
+        text-align: center;
+        color: #555;
+        font-size: 14px;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+        margin-top: 15px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-top: 6px;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+    .radio-group {
+        display: flex;
+        gap: 20px;
+        margin-top: 8px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .submit-btn {
+        background: #667eea;
+        color: white;
+    }
+
+    .reset-btn {
+        background: #e0e0e0;
+    }
+
+    .feedback-list {
+        margin-top: 25px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .feedback-item {
+        background: #f7f7f7;
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+
+    footer {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 15px;
+        color: #666;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>💬 Feedback</h1>
+    <p>We value your feedback</p>
+
+    <form id="feedbackForm">
+
+        <label>Name</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+
+        <label>Rate Our Service</label>
+        <select id="rating">
+            <option>Excellent</option>
+            <option>Very Good</option>
+            <option>Good</option>
+            <option>Average</option>
+            <option>Poor</option>
+        </select>
+
+        <label>Would you recommend us?</label>
+        <div class="radio-group">
+            <label><input type="radio" name="recommend" value="Yes" checked> Yes</label>
+            <label><input type="radio" name="recommend" value="No"> No</label>
+        </div>
+
+        <label>Comments</label>
+        <textarea id="comments" rows="4" placeholder="Write your feedback..."></textarea>
+
+        <div class="actions">
+            <button type="submit" class="submit-btn">Submit</button>
+            <button type="reset" class="reset-btn">Clear</button>
+        </div>
+    </form>
+
+    <div class="feedback-list" id="feedbackList"></div>
+
+    <footer>Feedback is saved securely ✔</footer>
+</div>
+
+<script>
+/* =========================
+   STATE MANAGEMENT
+========================= */
+let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
+/* =========================
+   DOM ELEMENTS
+========================= */
+const form = document.getElementById("feedbackForm");
+const feedbackList = document.getElementById("feedbackList");
+
+/* =========================
+   EVENTS
+========================= */
+form.addEventListener("submit", handleSubmit);
+
+/* =========================
+   FUNCTIONS
+========================= */
+function handleSubmit(e) {
+    e.preventDefault();
+
+    const feedback = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        rating: document.getElementById("rating").value,
+        recommend: document.querySelector('input[name="recommend"]:checked').value,
+        comments: document.getElementById("comments").value.trim()
+    };
+
+    feedbacks.push(feedback);
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+
+    form.reset();
+    renderFeedbacks();
+}
+
+function renderFeedbacks() {
+    feedbackList.innerHTML = "";
+
+    feedbacks.forEach(fb => {
+        const div = document.createElement("div");
+        div.className = "feedback-item";
+        div.innerHTML = `
+            <strong>${fb.name}</strong> (${fb.email})<br>
+            Rating: ${fb.rating} | Recommend: ${fb.recommend}<br>
+            <em>${fb.comments || "No comments"}</em>
+        `;
+        feedbackList.appendChild(div);
+    });
+}
+
+/* =========================
+   INITIAL LOAD
+========================= */
+renderFeedbacks();
+</script>
+
+</body>
+</html>
