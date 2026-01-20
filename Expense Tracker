@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Expense Tracker Pro</title>
+
+<style>
+:root{
+    --primary:#0f766e;
+    --income:#22c55e;
+    --expense:#ef4444;
+    --bg:#f0fdfa;
+    --card:#ffffff;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",system-ui,sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(135deg,#99f6e4,#ccfbf1);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.app{
+    width:560px;
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.25);
+    padding:22px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:4px;
+}
+
+.subtitle{
+    text-align:center;
+    font-size:14px;
+    color:#555;
+}
+
+.summary{
+    display:flex;
+    justify-content:space-between;
+    margin-top:18px;
+    gap:10px;
+}
+
+.card{
+    flex:1;
+    padding:12px;
+    border-radius:14px;
+    text-align:center;
+    background:var(--bg);
+}
+
+.card h3{
+    margin:4px 0;
+    font-size:14px;
+}
+
+.income{color:var(--income);}
+.expense{color:var(--expense);}
+
+.form{
+    display:flex;
+    gap:8px;
+    margin-top:18px;
+}
+
+.form input, .form select{
+    flex:1;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+
+.form button{
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    background:var(--primary);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.list{
+    margin-top:20px;
+    max-height:260px;
+    overflow-y:auto;
+}
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px;
+    border-radius:12px;
+    margin-bottom:8px;
+    background:var(--bg);
+    font-size:14px;
+}
+
+.item.income-item{
+    border-left:6px solid var(--income);
+}
+
+.item.expense-item{
+    border-left:6px solid var(--expense);
+}
+
+.item button{
+    border:none;
+    background:var(--expense);
+    color:white;
+    border-radius:8px;
+    padding:4px 8px;
+    cursor:pointer;
+    font-size:12px;
+}
+
+footer{
+    text-align:center;
+    margin-top:14px;
+    font-size:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <h1>💰 Expense Tracker</h1>
+    <p class="subtitle">Track income & expenses professionally</p>
+
+    <div class="summary">
+        <div class="card">
+            <h3>Total Income</h3>
+            <strong class="income" id="totalIncome">₹0</strong>
+        </div>
+        <div class="card">
+            <h3>Total Expense</h3>
+            <strong class="expense" id="totalExpense">₹0</strong>
+        </div>
+        <div class="card">
+            <h3>Balance</h3>
+            <strong id="balance">₹0</strong>
+        </div>
+    </div>
+
+    <div class="form">
+        <input type="text" id="title" placeholder="Description">
+        <input type="number" id="amount" placeholder="Amount">
+        <select id="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+        </select>
+        <button onclick="addEntry()">Add</button>
+    </div>
+
+    <div class="list" id="list"></div>
+
+    <footer>Data saved automatically ✔</footer>
+</div>
+
+<script>
+let records = JSON.parse(localStorage.getItem("expenses")) || [];
+
+const list = document.getElementById("list");
+const totalIncome = document.getElementById("totalIncome");
+const totalExpense = document.getElementById("totalExpense");
+const balance = document.getElementById("balance");
+
+function addEntry(){
+    const title = document.getElementById("title").value.trim();
+    const amount = +document.getElementById("amount").value;
+    const type = document.getElementById("type").value;
+
+    if(!title || !amount) return;
+
+    records.push({title,amount,type});
+    save();
+    render();
+    document.getElementById("title").value="";
+    document.getElementById("amount").value="";
+}
+
+function deleteEntry(i){
+    records.splice(i,1);
+    save();
+    render();
+}
+
+function save(){
+    localStorage.setItem("expenses",JSON.stringify(records));
+}
+
+function render(){
+    list.innerHTML="";
+    let income=0, expense=0;
+
+    records.forEach((r,i)=>{
+        if(r.type==="income") income+=r.amount;
+        else expense+=r.amount;
+
+        const div=document.createElement("div");
+        div.className=`item ${r.type}-item`;
+        div.innerHTML=`
+            <span>${r.title} - ₹${r.amount}</span>
+            <button onclick="deleteEntry(${i})">X</button>
+        `;
+        list.appendChild(div);
+    });
+
+    totalIncome.textContent="₹"+income;
+    totalExpense.textContent="₹"+expense;
+    balance.textContent="₹"+(income-expense);
+}
+
+render();
+</script>
+
+</body>
+</html>
