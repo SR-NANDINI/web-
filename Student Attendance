@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Attendance Manager</title>
+
+<style>
+:root{
+    --primary:#1d4ed8;
+    --present:#22c55e;
+    --absent:#ef4444;
+    --bg:#eff6ff;
+    --card:#ffffff;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",system-ui,sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(135deg,#bfdbfe,#e0e7ff);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.app{
+    width:600px;
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.25);
+    padding:22px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:4px;
+}
+
+.subtitle{
+    text-align:center;
+    font-size:14px;
+    color:#555;
+}
+
+.form{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.form input{
+    flex:1;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+
+.form button{
+    padding:12px 18px;
+    border:none;
+    border-radius:10px;
+    background:var(--primary);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.stats{
+    display:flex;
+    justify-content:space-between;
+    margin-top:18px;
+    gap:10px;
+}
+
+.stat{
+    flex:1;
+    background:var(--bg);
+    padding:12px;
+    border-radius:14px;
+    text-align:center;
+    font-size:14px;
+}
+
+.list{
+    margin-top:20px;
+    max-height:280px;
+    overflow-y:auto;
+}
+
+.student{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--bg);
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:8px;
+}
+
+.actions button{
+    border:none;
+    padding:6px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:12px;
+    margin-left:6px;
+}
+
+.present{
+    background:var(--present);
+    color:white;
+}
+
+.absent{
+    background:var(--absent);
+    color:white;
+}
+
+.delete{
+    background:#6b7280;
+    color:white;
+}
+
+footer{
+    text-align:center;
+    margin-top:15px;
+    font-size:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <h1>🎓 Attendance Manager</h1>
+    <p class="subtitle">Manage student attendance professionally</p>
+
+    <div class="form">
+        <input type="text" id="studentName" placeholder="Enter student name">
+        <button onclick="addStudent()">Add</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat">Total: <strong id="total">0</strong></div>
+        <div class="stat">Present: <strong id="present">0</strong></div>
+        <div class="stat">Absent: <strong id="absent">0</strong></div>
+    </div>
+
+    <div class="list" id="list"></div>
+
+    <footer>Attendance saved automatically ✔</footer>
+</div>
+
+<script>
+let students = JSON.parse(localStorage.getItem("attendance")) || [];
+
+const list = document.getElementById("list");
+const totalEl = document.getElementById("total");
+const presentEl = document.getElementById("present");
+const absentEl = document.getElementById("absent");
+
+function addStudent(){
+    const name = studentName.value.trim();
+    if(!name) return;
+
+    students.push({name,status:"present"});
+    save();
+    studentName.value="";
+    render();
+}
+
+function markStatus(index,status){
+    students[index].status = status;
+    save();
+    render();
+}
+
+function removeStudent(index){
+    students.splice(index,1);
+    save();
+    render();
+}
+
+function save(){
+    localStorage.setItem("attendance",JSON.stringify(students));
+}
+
+function render(){
+    list.innerHTML="";
+    let present=0, absent=0;
+
+    students.forEach((s,i)=>{
+        if(s.status==="present") present++;
+        else absent++;
+
+        const div=document.createElement("div");
+        div.className="student";
+        div.innerHTML=`
+            <span>${s.name} (${s.status})</span>
+            <div class="actions">
+                <button class="present" onclick="markStatus(${i},'present')">Present</button>
+                <button class="absent" onclick="markStatus(${i},'absent')">Absent</button>
+                <button class="delete" onclick="removeStudent(${i})">Remove</button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+
+    totalEl.textContent = students.length;
+    presentEl.textContent = present;
+    absentEl.textContent = absent;
+}
+
+render();
+</script>
+
+</body>
+</html>
