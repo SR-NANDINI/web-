@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FocusFlow – Smart Study Planner</title>
+
+<style>
+:root{
+    --primary:#6366f1;
+    --accent:#22c55e;
+    --danger:#ef4444;
+    --bg:#eef2ff;
+    --card:#ffffff;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",system-ui,sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(135deg,#c7d2fe,#e0e7ff);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.app{
+    width:620px;
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:0 25px 55px rgba(0,0,0,.25);
+    padding:24px;
+}
+
+h1{
+    text-align:center;
+    margin:0;
+}
+
+.subtitle{
+    text-align:center;
+    font-size:14px;
+    color:#555;
+    margin-bottom:18px;
+}
+
+.controls{
+    display:flex;
+    gap:10px;
+}
+
+.controls input{
+    flex:1;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #ccc;
+}
+
+.controls button{
+    padding:12px 18px;
+    border:none;
+    border-radius:12px;
+    background:var(--primary);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.timer{
+    text-align:center;
+    margin:20px 0;
+}
+
+.time{
+    font-size:48px;
+    font-weight:700;
+}
+
+.timer button{
+    margin:8px 4px;
+    padding:10px 18px;
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.start{background:var(--accent);color:white;}
+.stop{background:var(--danger);color:white;}
+.reset{background:#e5e7eb;}
+
+.tasks{
+    max-height:260px;
+    overflow-y:auto;
+}
+
+.task{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--bg);
+    padding:12px;
+    border-radius:14px;
+    margin-bottom:8px;
+}
+
+.task.done span{
+    text-decoration:line-through;
+    color:#777;
+}
+
+.task button{
+    border:none;
+    padding:6px 10px;
+    border-radius:8px;
+    font-size:12px;
+    cursor:pointer;
+}
+
+.complete{background:var(--accent);color:white;}
+.delete{background:var(--danger);color:white;}
+
+footer{
+    text-align:center;
+    font-size:12px;
+    margin-top:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <h1>🧠 FocusFlow</h1>
+    <p class="subtitle">Smart study planner with focus timer</p>
+
+    <div class="controls">
+        <input id="taskInput" placeholder="Add study task">
+        <button onclick="addTask()">Add</button>
+    </div>
+
+    <div class="timer">
+        <div class="time" id="time">25:00</div>
+        <button class="start" onclick="startTimer()">Start</button>
+        <button class="stop" onclick="stopTimer()">Pause</button>
+        <button class="reset" onclick="resetTimer()">Reset</button>
+    </div>
+
+    <div class="tasks" id="tasks"></div>
+
+    <footer>Tasks & focus sessions saved automatically ✔</footer>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("focusTasks")) || [];
+let minutes = 25;
+let seconds = 0;
+let interval = null;
+
+const timeEl = document.getElementById("time");
+const tasksEl = document.getElementById("tasks");
+
+function addTask(){
+    const text = taskInput.value.trim();
+    if(!text) return;
+    tasks.push({text,done:false});
+    save();
+    taskInput.value="";
+    render();
+}
+
+function toggleTask(i){
+    tasks[i].done = !tasks[i].done;
+    save();
+    render();
+}
+
+function deleteTask(i){
+    tasks.splice(i,1);
+    save();
+    render();
+}
+
+function startTimer(){
+    if(interval) return;
+    interval = setInterval(()=>{
+        if(seconds===0){
+            if(minutes===0){
+                stopTimer();
+                alert("Focus session completed 🎯");
+                return;
+            }
+            minutes--;
+            seconds=59;
+        }else{
+            seconds--;
+        }
+        updateTime();
+    },1000);
+}
+
+function stopTimer(){
+    clearInterval(interval);
+    interval=null;
+}
+
+function resetTimer(){
+    stopTimer();
+    minutes=25;
+    seconds=0;
+    updateTime();
+}
+
+function updateTime(){
+    timeEl.textContent=
+        String(minutes).padStart(2,"0")+":"+
+        String(seconds).padStart(2,"0");
+}
+
+function save(){
+    localStorage.setItem("focusTasks",JSON.stringify(tasks));
+}
+
+function render(){
+    tasksEl.innerHTML="";
+    tasks.forEach((t,i)=>{
+        const div=document.createElement("div");
+        div.className="task"+(t.done?" done":"");
+        div.innerHTML=`
+            <span>${t.text}</span>
+            <div>
+                <button class="complete" onclick="toggleTask(${i})">Done</button>
+                <button class="delete" onclick="deleteTask(${i})">Delete</button>
+            </div>
+        `;
+        tasksEl.appendChild(div);
+    });
+}
+
+updateTime();
+render();
+</script>
+
+</body>
+</html>
