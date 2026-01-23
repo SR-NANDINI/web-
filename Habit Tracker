@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HabitSync – Smart Habit Tracker</title>
+
+<style>
+:root{
+    --primary:#16a34a;
+    --danger:#ef4444;
+    --bg:#ecfdf5;
+    --card:#ffffff;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",system-ui,sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(135deg,#bbf7d0,#dcfce7);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.app{
+    width:600px;
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:0 25px 50px rgba(0,0,0,0.25);
+    padding:24px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:6px;
+}
+
+.subtitle{
+    text-align:center;
+    font-size:14px;
+    color:#555;
+}
+
+.add{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.add input{
+    flex:1;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #ccc;
+}
+
+.add button{
+    padding:12px 18px;
+    border:none;
+    border-radius:12px;
+    background:var(--primary);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.list{
+    margin-top:20px;
+    max-height:300px;
+    overflow-y:auto;
+}
+
+.habit{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--bg);
+    padding:14px;
+    border-radius:16px;
+    margin-bottom:10px;
+}
+
+.habit.done span{
+    text-decoration:line-through;
+    color:#777;
+}
+
+.actions button{
+    border:none;
+    padding:6px 10px;
+    border-radius:8px;
+    font-size:12px;
+    cursor:pointer;
+}
+
+.check{
+    background:var(--primary);
+    color:white;
+}
+
+.delete{
+    background:var(--danger);
+    color:white;
+}
+
+.progress{
+    margin-top:16px;
+    font-size:14px;
+    text-align:center;
+}
+
+footer{
+    text-align:center;
+    margin-top:12px;
+    font-size:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <h1>🌱 HabitSync</h1>
+    <p class="subtitle">Build habits. Track progress. Stay consistent.</p>
+
+    <div class="add">
+        <input id="habitInput" placeholder="Enter a new habit">
+        <button onclick="addHabit()">Add</button>
+    </div>
+
+    <div class="list" id="habitList"></div>
+
+    <div class="progress" id="progress"></div>
+
+    <footer>Habits saved automatically ✔</footer>
+</div>
+
+<script>
+let habits = JSON.parse(localStorage.getItem("habits")) || [];
+
+const habitList = document.getElementById("habitList");
+const progressEl = document.getElementById("progress");
+
+function addHabit(){
+    const text = habitInput.value.trim();
+    if(!text) return;
+
+    habits.push({text,done:false});
+    save();
+    habitInput.value="";
+    render();
+}
+
+function toggleHabit(i){
+    habits[i].done = !habits[i].done;
+    save();
+    render();
+}
+
+function deleteHabit(i){
+    habits.splice(i,1);
+    save();
+    render();
+}
+
+function save(){
+    localStorage.setItem("habits",JSON.stringify(habits));
+}
+
+function render(){
+    habitList.innerHTML="";
+    let completed = 0;
+
+    habits.forEach((h,i)=>{
+        if(h.done) completed++;
+
+        const div=document.createElement("div");
+        div.className="habit"+(h.done?" done":"");
+        div.innerHTML=`
+            <span>${h.text}</span>
+            <div class="actions">
+                <button class="check" onclick="toggleHabit(${i})">
+                    ${h.done ? "Undo" : "Done"}
+                </button>
+                <button class="delete" onclick="deleteHabit(${i})">Delete</button>
+            </div>
+        `;
+        habitList.appendChild(div);
+    });
+
+    progressEl.textContent = 
+        habits.length === 0 
+        ? "No habits yet"
+        : `Progress: ${completed}/${habits.length} habits completed`;
+}
+
+render();
+</script>
+
+</body>
+</html>
