@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FlowBoard – Personal Kanban System</title>
+
+<style>
+:root{
+    --todo:#fef3c7;
+    --progress:#dbeafe;
+    --done:#dcfce7;
+    --primary:#0f172a;
+    --card:#ffffff;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",system-ui,sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(135deg,#e0e7ff,#f8fafc);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.board{
+    width:900px;
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:0 25px 55px rgba(0,0,0,0.25);
+    padding:22px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:6px;
+}
+
+.subtitle{
+    text-align:center;
+    font-size:14px;
+    color:#555;
+}
+
+.add{
+    display:flex;
+    gap:10px;
+    margin:18px 0;
+}
+
+.add input{
+    flex:1;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #ccc;
+}
+
+.add button{
+    padding:12px 18px;
+    border:none;
+    border-radius:12px;
+    background:var(--primary);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.columns{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.column{
+    border-radius:16px;
+    padding:12px;
+}
+
+.column h3{
+    text-align:center;
+    margin-top:0;
+}
+
+.todo{background:var(--todo);}
+.progress{background:var(--progress);}
+.done{background:var(--done);}
+
+.task{
+    background:white;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:14px;
+}
+
+.actions button{
+    border:none;
+    padding:4px 8px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:11px;
+    margin-left:4px;
+}
+
+.next{background:#38bdf8;color:#002;}
+.prev{background:#a7f3d0;color:#002;}
+.delete{background:#ef4444;color:white;}
+
+footer{
+    text-align:center;
+    margin-top:12px;
+    font-size:12px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="board">
+    <h1>🧩 FlowBoard</h1>
+    <p class="subtitle">Visual task flow management (Kanban style)</p>
+
+    <div class="add">
+        <input id="taskInput" placeholder="Add a new task">
+        <button onclick="addTask()">Add</button>
+    </div>
+
+    <div class="columns">
+        <div class="column todo">
+            <h3>To Do</h3>
+            <div id="todo"></div>
+        </div>
+
+        <div class="column progress">
+            <h3>In Progress</h3>
+            <div id="progress"></div>
+        </div>
+
+        <div class="column done">
+            <h3>Completed</h3>
+            <div id="done"></div>
+        </div>
+    </div>
+
+    <footer>Board state saved automatically ✔</footer>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("kanban")) || [];
+
+const todoEl = document.getElementById("todo");
+const progressEl = document.getElementById("progress");
+const doneEl = document.getElementById("done");
+
+function addTask(){
+    const text = taskInput.value.trim();
+    if(!text) return;
+
+    tasks.push({text,status:"todo"});
+    save();
+    taskInput.value="";
+    render();
+}
+
+function moveTask(i,dir){
+    const order = ["todo","progress","done"];
+    let idx = order.indexOf(tasks[i].status);
+    idx += dir;
+    if(idx<0 || idx>=order.length) return;
+    tasks[i].status = order[idx];
+    save();
+    render();
+}
+
+function deleteTask(i){
+    tasks.splice(i,1);
+    save();
+    render();
+}
+
+function save(){
+    localStorage.setItem("kanban",JSON.stringify(tasks));
+}
+
+function render(){
+    todoEl.innerHTML="";
+    progressEl.innerHTML="";
+    doneEl.innerHTML="";
+
+    tasks.forEach((t,i)=>{
+        const div=document.createElement("div");
+        div.className="task";
+        div.innerHTML=`
+            <span>${t.text}</span>
+            <div class="actions">
+                ${t.status!=="todo" ? `<button class="prev" onclick="moveTask(${i},-1)">←</button>` : ""}
+                ${t.status!=="done" ? `<button class="next" onclick="moveTask(${i},1)">→</button>` : ""}
+                <button class="delete" onclick="deleteTask(${i})">✕</button>
+            </div>
+        `;
+        if(t.status==="todo") todoEl.appendChild(div);
+        else if(t.status==="progress") progressEl.appendChild(div);
+        else doneEl.appendChild(div);
+    });
+}
+
+render();
+</script>
+
+</body>
+</html>
