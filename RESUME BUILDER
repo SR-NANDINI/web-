@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ProResume – Resume Builder</title>
+
+<style>
+:root{
+    --primary:#2563eb;
+    --accent:#22c55e;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --text:#0f172a;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",system-ui,sans-serif;
+}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#dbeafe,#f8fafc);
+    min-height:100vh;
+    padding:20px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.panel{
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:0 25px 50px rgba(0,0,0,.25);
+    padding:22px;
+}
+
+h1{
+    grid-column:span 2;
+    text-align:center;
+    margin-bottom:0;
+}
+
+.subtitle{
+    grid-column:span 2;
+    text-align:center;
+    color:#555;
+    margin-bottom:20px;
+}
+
+label{
+    font-size:13px;
+    font-weight:600;
+}
+
+input, textarea{
+    width:100%;
+    padding:10px;
+    margin:6px 0 14px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+
+textarea{resize:none}
+
+button{
+    padding:10px 14px;
+    border:none;
+    border-radius:12px;
+    background:var(--primary);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.preview{
+    background:#fff;
+    border-radius:16px;
+    padding:24px;
+    min-height:600px;
+}
+
+.preview h2{
+    margin:0;
+    color:var(--primary);
+}
+
+.preview .role{
+    font-weight:600;
+    color:#555;
+}
+
+.section{
+    margin-top:16px;
+}
+
+.section h3{
+    border-bottom:2px solid var(--bg);
+    padding-bottom:4px;
+}
+
+footer{
+    grid-column:span 2;
+    text-align:center;
+    font-size:12px;
+    color:#666;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📄 ProResume</h1>
+<p class="subtitle">Professional Resume Builder (Live Preview)</p>
+
+<div class="container">
+
+    <div class="panel">
+        <label>Full Name</label>
+        <input id="name" placeholder="Your name">
+
+        <label>Role / Title</label>
+        <input id="role" placeholder="Frontend Developer">
+
+        <label>Email</label>
+        <input id="email" placeholder="email@example.com">
+
+        <label>Phone</label>
+        <input id="phone" placeholder="+91 XXXXX XXXXX">
+
+        <label>Professional Summary</label>
+        <textarea id="summary" rows="4"></textarea>
+
+        <label>Skills (comma separated)</label>
+        <input id="skills" placeholder="HTML, CSS, JavaScript">
+
+        <label>Experience</label>
+        <textarea id="experience" rows="4"></textarea>
+
+        <label>Education</label>
+        <textarea id="education" rows="3"></textarea>
+
+        <button onclick="saveResume()">Save Resume</button>
+    </div>
+
+    <div class="preview" id="preview">
+        <h2 id="pname">Your Name</h2>
+        <div class="role" id="prole">Your Role</div>
+        <p id="pcontact"></p>
+
+        <div class="section">
+            <h3>Summary</h3>
+            <p id="psummary"></p>
+        </div>
+
+        <div class="section">
+            <h3>Skills</h3>
+            <ul id="pskills"></ul>
+        </div>
+
+        <div class="section">
+            <h3>Experience</h3>
+            <p id="pexp"></p>
+        </div>
+
+        <div class="section">
+            <h3>Education</h3>
+            <p id="pedu"></p>
+        </div>
+    </div>
+
+</div>
+
+<footer>Data stored locally • No backend required</footer>
+
+<script>
+const fields=["name","role","email","phone","summary","skills","experience","education"];
+
+function updatePreview(){
+    pname.innerText=name.value||"Your Name";
+    prole.innerText=role.value||"Your Role";
+    pcontact.innerText=`${email.value||""} ${phone.value?" | "+phone.value:""}`;
+    psummary.innerText=summary.value;
+    pexp.innerText=experience.value;
+    pedu.innerText=education.value;
+
+    pskills.innerHTML="";
+    skills.value.split(",").filter(s=>s.trim()).forEach(s=>{
+        const li=document.createElement("li");
+        li.innerText=s.trim();
+        pskills.appendChild(li);
+    });
+}
+
+fields.forEach(id=>{
+    document.getElementById(id).addEventListener("input",updatePreview);
+});
+
+function saveResume(){
+    const data={};
+    fields.forEach(id=>data[id]=document.getElementById(id).value);
+    localStorage.setItem("resume",JSON.stringify(data));
+    alert("Resume saved successfully ✔");
+}
+
+(function load(){
+    const data=JSON.parse(localStorage.getItem("resume"));
+    if(!data) return;
+    fields.forEach(id=>document.getElementById(id).value=data[id]||"");
+    updatePreview();
+})();
+</script>
+
+</body>
+</html>
