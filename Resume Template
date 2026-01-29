@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EliteResume – Premium Templates</title>
+
+<style>
+*{box-sizing:border-box;font-family:"Segoe UI",system-ui,sans-serif}
+
+body{
+    margin:0;
+    background:#0f172a;
+    padding:20px;
+    color:#fff;
+}
+
+h1{text-align:center;margin-bottom:10px}
+p{text-align:center;color:#cbd5f5}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:1fr 1.3fr;
+    gap:20px;
+}
+
+.panel{
+    background:#020617;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,.6);
+}
+
+select,input,textarea{
+    width:100%;
+    padding:10px;
+    margin:6px 0 14px;
+    border-radius:10px;
+    border:none;
+}
+
+button{
+    padding:10px 16px;
+    border:none;
+    border-radius:12px;
+    background:#6366f1;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* ===== PREMIUM TEMPLATES ===== */
+
+.resume{
+    min-height:650px;
+    padding:28px;
+    border-radius:20px;
+}
+
+/* Executive */
+.exec{
+    background:#ffffff;
+    color:#000;
+    border-top:8px solid #1e3a8a;
+}
+
+/* Dark Tech */
+.tech{
+    background:linear-gradient(135deg,#020617,#020617);
+    color:#e5e7eb;
+    border-left:6px solid #22d3ee;
+}
+
+/* Minimal Pro */
+.minimal{
+    background:#f8fafc;
+    color:#020617;
+    font-family:Georgia,serif;
+}
+
+/* Creative Luxe */
+.luxe{
+    background:linear-gradient(135deg,#78350f,#451a03);
+    color:#fef3c7;
+    border-radius:32px;
+}
+
+.resume h2{margin:0}
+.role{font-weight:600;margin-bottom:10px}
+.section{margin-top:16px}
+.section h3{border-bottom:1px solid rgba(255,255,255,.3)}
+
+ul{padding-left:18px}
+
+@media print{
+    body{background:#fff}
+    .container{grid-template-columns:1fr}
+    .panel:first-child{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<h1>👑 EliteResume</h1>
+<p>Premium multi-template resume builder</p>
+
+<div class="container">
+
+<div class="panel">
+    <label>Choose Premium Template</label>
+    <select id="theme" onchange="updateTheme()">
+        <option value="exec">Executive</option>
+        <option value="tech">Dark Tech</option>
+        <option value="minimal">Minimal Pro</option>
+        <option value="luxe">Creative Luxe</option>
+    </select>
+
+    <input id="name" placeholder="Full Name">
+    <input id="role" placeholder="Role / Title">
+    <input id="email" placeholder="Email">
+
+    <textarea id="summary" placeholder="Professional Summary"></textarea>
+    <input id="skills" placeholder="Skills (comma separated)">
+    <textarea id="experience" placeholder="Experience"></textarea>
+    <textarea id="education" placeholder="Education"></textarea>
+
+    <button onclick="save()">Save Resume</button>
+    <button onclick="window.print()">Print / PDF</button>
+</div>
+
+<div class="panel resume exec" id="resume">
+    <h2 id="pname">Your Name</h2>
+    <div class="role" id="prole">Your Role</div>
+    <div id="pemail"></div>
+
+    <div class="section">
+        <h3>Summary</h3>
+        <p id="psummary"></p>
+    </div>
+
+    <div class="section">
+        <h3>Skills</h3>
+        <ul id="pskills"></ul>
+    </div>
+
+    <div class="section">
+        <h3>Experience</h3>
+        <p id="pexp"></p>
+    </div>
+
+    <div class="section">
+        <h3>Education</h3>
+        <p id="pedu"></p>
+    </div>
+</div>
+
+</div>
+
+<script>
+const fields=["name","role","email","summary","skills","experience","education"];
+
+fields.forEach(f=>{
+    document.getElementById(f).addEventListener("input",update);
+});
+
+function update(){
+    pname.innerText=name.value||"Your Name";
+    prole.innerText=role.value||"Your Role";
+    pemail.innerText=email.value;
+    psummary.innerText=summary.value;
+    pexp.innerText=experience.value;
+    pedu.innerText=education.value;
+
+    pskills.innerHTML="";
+    skills.value.split(",").filter(s=>s.trim()).forEach(s=>{
+        let li=document.createElement("li");
+        li.innerText=s.trim();
+        pskills.appendChild(li);
+    });
+}
+
+function updateTheme(){
+    resume.className="panel resume "+theme.value;
+}
+
+function save(){
+    let data={};
+    fields.forEach(f=>data[f]=document.getElementById(f).value);
+    data.theme=theme.value;
+    localStorage.setItem("eliteResume",JSON.stringify(data));
+    alert("Resume saved ✔");
+}
+
+(function load(){
+    let d=JSON.parse(localStorage.getItem("eliteResume"));
+    if(!d) return;
+    fields.forEach(f=>document.getElementById(f).value=d[f]||"");
+    theme.value=d.theme||"exec";
+    updateTheme();
+    update();
+})();
+</script>
+
+</body>
+</html>
