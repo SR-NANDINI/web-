@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ProMeet – Appointment Scheduler</title>
+
+<style>
+:root{
+    --primary:#4f46e5;
+    --accent:#22c55e;
+    --danger:#ef4444;
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#0f172a;
+}
+
+*{box-sizing:border-box;font-family:"Segoe UI",system-ui,sans-serif}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#eef2ff,#f8fafc);
+    min-height:100vh;
+    padding:24px;
+    color:var(--text);
+}
+
+.app{max-width:1100px;margin:auto}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+header h1{margin:0}
+
+.grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:20px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+label{font-weight:600;font-size:14px}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin:8px 0 16px;
+    border-radius:10px;
+    border:1px solid #cbd5f5;
+}
+
+button{
+    padding:12px;
+    width:100%;
+    border:none;
+    border-radius:12px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.primary{background:var(--primary);color:#fff}
+.danger{background:var(--danger);color:#fff}
+
+.appointment{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#eef2ff;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:10px;
+}
+
+.date{
+    font-weight:700;
+    color:var(--primary);
+}
+
+.empty{
+    text-align:center;
+    color:#64748b;
+    padding:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>📅 ProMeet Scheduler</h1>
+</header>
+
+<div class="grid">
+
+<div class="card">
+    <h2>New Appointment</h2>
+
+    <label>Name</label>
+    <input id="name" placeholder="Client name">
+
+    <label>Date</label>
+    <input type="date" id="date">
+
+    <label>Time</label>
+    <input type="time" id="time">
+
+    <label>Service</label>
+    <select id="service">
+        <option>Consultation</option>
+        <option>Follow-up</option>
+        <option>Strategy Meeting</option>
+        <option>Technical Support</option>
+    </select>
+
+    <button class="primary" onclick="addAppointment()">Schedule</button>
+</div>
+
+<div class="card">
+    <h2>Upcoming Appointments</h2>
+    <div id="appointments"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+let appointments = JSON.parse(localStorage.getItem("appointments")) || [];
+
+function addAppointment(){
+    const name=document.getElementById("name").value;
+    const date=document.getElementById("date").value;
+    const time=document.getElementById("time").value;
+    const service=document.getElementById("service").value;
+
+    if(!name||!date||!time){alert("Fill all fields");return;}
+
+    appointments.push({name,date,time,service});
+    save();
+    clearForm();
+    render();
+}
+
+function removeAppointment(i){
+    appointments.splice(i,1);
+    save();
+    render();
+}
+
+function render(){
+    const box=document.getElementById("appointments");
+    box.innerHTML="";
+
+    if(appointments.length===0){
+        box.innerHTML=`<div class="empty">No appointments scheduled</div>`;
+        return;
+    }
+
+    appointments.forEach((a,i)=>{
+        box.innerHTML+=`
+        <div class="appointment">
+            <div>
+                <div class="date">${a.date} • ${a.time}</div>
+                <div>${a.name} — ${a.service}</div>
+            </div>
+            <button class="danger" onclick="removeAppointment(${i})">Cancel</button>
+        </div>`;
+    });
+}
+
+function clearForm(){
+    name.value="";
+    date.value="";
+    time.value="";
+}
+
+function save(){
+    localStorage.setItem("appointments",JSON.stringify(appointments));
+}
+
+render();
+</script>
+
+</body>
+</html>
