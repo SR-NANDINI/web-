@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KanbanFlow – Project Task Board</title>
+
+<style>
+:root{
+    --todo:#60a5fa;
+    --progress:#facc15;
+    --done:#22c55e;
+    --danger:#ef4444;
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#0f172a;
+}
+
+*{box-sizing:border-box;font-family:"Segoe UI",system-ui,sans-serif}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#e0f2fe,#f8fafc);
+    min-height:100vh;
+    padding:24px;
+    color:var(--text);
+}
+
+.app{max-width:1200px;margin:auto}
+
+header{
+    margin-bottom:20px;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.column{
+    background:var(--card);
+    border-radius:20px;
+    padding:16px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.column h2{
+    text-align:center;
+}
+
+.task{
+    background:#f1f5f9;
+    border-radius:14px;
+    padding:12px;
+    margin-bottom:10px;
+    cursor:pointer;
+}
+
+.task small{
+    display:block;
+    color:#475569;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:10px;
+    border:1px solid #cbd5f5;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.add{background:#2563eb;color:#fff}
+.del{background:var(--danger);color:#fff;margin-top:6px}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>📌 KanbanFlow</h1>
+    <p>Professional project task management board</p>
+</header>
+
+<div class="board">
+
+<div class="column" data-status="todo">
+    <h2 style="color:#2563eb">To Do</h2>
+    <input placeholder="New task" onkeydown="if(event.key==='Enter')addTask(this,'todo')">
+    <div id="todo"></div>
+</div>
+
+<div class="column" data-status="progress">
+    <h2 style="color:#ca8a04">In Progress</h2>
+    <div id="progress"></div>
+</div>
+
+<div class="column" data-status="done">
+    <h2 style="color:#15803d">Done</h2>
+    <div id="done"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("kanban")) || [];
+
+function addTask(input,status){
+    if(!input.value.trim()) return;
+    tasks.push({text:input.value,status});
+    input.value="";
+    save();
+    render();
+}
+
+function moveTask(i){
+    const flow=["todo","progress","done"];
+    let idx=flow.indexOf(tasks[i].status);
+    tasks[i].status=flow[(idx+1)%3];
+    save();
+    render();
+}
+
+function deleteTask(i){
+    tasks.splice(i,1);
+    save();
+    render();
+}
+
+function render(){
+    todo.innerHTML="";
+    progress.innerHTML="";
+    done.innerHTML="";
+
+    tasks.forEach((t,i)=>{
+        const el=document.createElement("div");
+        el.className="task";
+        el.innerHTML=`<strong>${t.text}</strong>
+        <small>Click to move</small>
+        <button class="del">Delete</button>`;
+
+        el.onclick=()=>moveTask(i);
+        el.querySelector("button").onclick=e=>{
+            e.stopPropagation();
+            deleteTask(i);
+        };
+
+        document.getElementById(t.status).appendChild(el);
+    });
+}
+
+function save(){
+    localStorage.setItem("kanban",JSON.stringify(tasks));
+}
+
+render();
+</script>
+
+</body>
+</html>
