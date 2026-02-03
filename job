@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HireTrack – Job Application Tracker</title>
+
+<style>
+:root{
+    --applied:#60a5fa;
+    --interview:#facc15;
+    --offer:#22c55e;
+    --rejected:#ef4444;
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#0f172a;
+}
+
+*{box-sizing:border-box;font-family:"Segoe UI",system-ui,sans-serif}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#e0e7ff,#f8fafc);
+    min-height:100vh;
+    padding:24px;
+    color:var(--text);
+}
+
+.app{max-width:1200px;margin:auto}
+
+header{
+    margin-bottom:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:20px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+label{font-weight:600;font-size:14px}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin:8px 0 16px;
+    border-radius:10px;
+    border:1px solid #c7d2fe;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.primary{background:#2563eb;color:#fff}
+.danger{background:var(--rejected);color:#fff}
+
+.pipeline{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+
+.column{
+    background:#f1f5f9;
+    border-radius:16px;
+    padding:14px;
+}
+
+.column h3{
+    text-align:center;
+}
+
+.job{
+    background:#ffffff;
+    border-radius:12px;
+    padding:10px;
+    margin-bottom:10px;
+    cursor:pointer;
+    box-shadow:0 10px 20px rgba(0,0,0,.1);
+}
+
+.job small{
+    display:block;
+    color:#475569;
+}
+
+.job button{
+    margin-top:6px;
+    padding:6px;
+    font-size:12px;
+}
+
+.empty{
+    text-align:center;
+    color:#64748b;
+    padding:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>💼 HireTrack</h1>
+    <p>Professional Job Application Management System</p>
+</header>
+
+<div class="grid">
+
+<div class="card">
+    <h2>Add Job Application</h2>
+
+    <label>Company Name</label>
+    <input id="company" placeholder="Google, Amazon...">
+
+    <label>Role</label>
+    <input id="role" placeholder="Software Engineer">
+
+    <label>Status</label>
+    <select id="status">
+        <option value="applied">Applied</option>
+        <option value="interview">Interview</option>
+        <option value="offer">Offer</option>
+        <option value="rejected">Rejected</option>
+    </select>
+
+    <button class="primary" onclick="addJob()">Add Application</button>
+</div>
+
+<div class="card">
+    <h2>Application Pipeline</h2>
+
+    <div class="pipeline">
+        <div class="column">
+            <h3 style="color:#2563eb">Applied</h3>
+            <div id="applied"></div>
+        </div>
+        <div class="column">
+            <h3 style="color:#ca8a04">Interview</h3>
+            <div id="interview"></div>
+        </div>
+        <div class="column">
+            <h3 style="color:#15803d">Offer</h3>
+            <div id="offer"></div>
+        </div>
+        <div class="column">
+            <h3 style="color:#dc2626">Rejected</h3>
+            <div id="rejected"></div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+function addJob(){
+    const company=companyEl.value.trim();
+    const role=roleEl.value.trim();
+    const status=statusEl.value;
+
+    if(!company || !role){
+        alert("Fill all fields");
+        return;
+    }
+
+    jobs.push({company,role,status});
+    save();
+    clearForm();
+    render();
+}
+
+function moveJob(i){
+    const flow=["applied","interview","offer","rejected"];
+    let idx=flow.indexOf(jobs[i].status);
+    jobs[i].status=flow[(idx+1)%flow.length];
+    save();
+    render();
+}
+
+function deleteJob(i){
+    jobs.splice(i,1);
+    save();
+    render();
+}
+
+function render(){
+    applied.innerHTML="";
+    interview.innerHTML="";
+    offer.innerHTML="";
+    rejected.innerHTML="";
+
+    if(jobs.length===0){
+        applied.innerHTML=`<div class="empty">No applications yet</div>`;
+    }
+
+    jobs.forEach((j,i)=>{
+        const el=document.createElement("div");
+        el.className="job";
+        el.innerHTML=`
+            <strong>${j.company}</strong>
+            <small>${j.role}</small>
+            <small>Click to move →</small>
+            <button class="danger">Delete</button>
+        `;
+
+        el.onclick=()=>moveJob(i);
+        el.querySelector("button").onclick=e=>{
+            e.stopPropagation();
+            deleteJob(i);
+        };
+
+        document.getElementById(j.status).appendChild(el);
+    });
+}
+
+function clearForm(){
+    companyEl.value="";
+    roleEl.value="";
+}
+
+function save(){
+    localStorage.setItem("jobs",JSON.stringify(jobs));
+}
+
+const companyEl=document.getElementById("company");
+const roleEl=document.getElementById("role");
+const statusEl=document.getElementById("status");
+
+render();
+</script>
+
+</body>
+</html>
