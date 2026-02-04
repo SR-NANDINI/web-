@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FocusZen – Habit & Streak Tracker</title>
+
+<style>
+:root{
+    --primary:#0ea5e9;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --bg:#f0f9ff;
+    --card:#ffffff;
+    --text:#0f172a;
+}
+
+*{box-sizing:border-box;font-family:"Segoe UI",system-ui,sans-serif}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#e0f2fe,#f0f9ff);
+    min-height:100vh;
+    padding:24px;
+    color:var(--text);
+}
+
+.app{max-width:1100px;margin:auto}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:20px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+label{font-weight:600;font-size:14px}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:8px 0 16px;
+    border-radius:10px;
+    border:1px solid #bae6fd;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.primary{background:var(--primary);color:#fff}
+.success{background:var(--success);color:#fff}
+.danger{background:var(--danger);color:#fff}
+
+.habit{
+    background:#e0f2fe;
+    border-radius:14px;
+    padding:12px;
+    margin-bottom:12px;
+}
+
+.habit-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.streak{
+    font-size:13px;
+    color:#0369a1;
+}
+
+.empty{
+    text-align:center;
+    color:#0284c7;
+    padding:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>🔥 FocusZen</h1>
+    <p>Habit & Streak Tracker</p>
+</header>
+
+<div class="grid">
+
+<div class="card">
+    <h2>Add New Habit</h2>
+
+    <label>Habit Name</label>
+    <input id="habitName" placeholder="Daily Coding, Reading...">
+
+    <button class="primary" onclick="addHabit()">Add Habit</button>
+</div>
+
+<div class="card">
+    <h2>My Habits</h2>
+    <div id="habits"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+let habits = JSON.parse(localStorage.getItem("habits")) || [];
+
+function addHabit(){
+    const name=habitName.value.trim();
+    if(!name){alert("Enter habit name");return;}
+
+    habits.push({
+        name,
+        streak:0,
+        lastDone:null
+    });
+
+    habitName.value="";
+    save();
+    render();
+}
+
+function markDone(i){
+    const today=new Date().toDateString();
+    if(habits[i].lastDone!==today){
+        habits[i].streak++;
+        habits[i].lastDone=today;
+        save();
+        render();
+    }
+}
+
+function removeHabit(i){
+    habits.splice(i,1);
+    save();
+    render();
+}
+
+function render(){
+    habitsBox.innerHTML="";
+
+    if(habits.length===0){
+        habitsBox.innerHTML=`<div class="empty">No habits added yet</div>`;
+        return;
+    }
+
+    habits.forEach((h,i)=>{
+        habitsBox.innerHTML+=`
+        <div class="habit">
+            <div class="habit-header">
+                <strong>${h.name}</strong>
+                <button class="danger" onclick="removeHabit(${i})">x</button>
+            </div>
+            <div class="streak">🔥 Streak: ${h.streak} days</div>
+            <button class="success" onclick="markDone(${i})">Mark Done Today</button>
+        </div>`;
+    });
+}
+
+function save(){
+    localStorage.setItem("habits",JSON.stringify(habits));
+}
+
+const habitsBox=document.getElementById("habits");
+const habitName=document.getElementById("habitName");
+
+render();
+</script>
+
+</body>
+</html>
