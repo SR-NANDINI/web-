@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NoteVault Pro – Smart Notes Manager</title>
+
+<style>
+:root{
+    --primary:#6366f1;
+    --accent:#22c55e;
+    --danger:#ef4444;
+    --bg:#eef2ff;
+    --card:#ffffff;
+    --text:#0f172a;
+}
+
+*{box-sizing:border-box;font-family:"Segoe UI",system-ui,sans-serif}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#e0e7ff,#f8fafc);
+    min-height:100vh;
+    padding:24px;
+    color:var(--text);
+}
+
+.app{max-width:1200px;margin:auto}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.search{
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #c7d2fe;
+    width:280px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:20px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+label{font-weight:600;font-size:14px}
+
+input,textarea{
+    width:100%;
+    padding:10px;
+    margin:8px 0 14px;
+    border-radius:10px;
+    border:1px solid #c7d2fe;
+}
+
+textarea{resize:none;height:120px}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.primary{background:var(--primary);color:#fff}
+.danger{background:var(--danger);color:#fff}
+
+.note{
+    background:#eef2ff;
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.note h4{margin:0}
+.note small{color:#475569}
+
+.note-actions{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+}
+
+.note-actions button{
+    flex:1;
+    padding:6px;
+    font-size:12px;
+}
+
+.empty{
+    text-align:center;
+    color:#6366f1;
+    padding:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>📝 NoteVault Pro</h1>
+    <input class="search" placeholder="Search notes..." oninput="searchNotes(this.value)">
+</header>
+
+<div class="grid">
+
+<div class="card">
+    <h2>Create Note</h2>
+
+    <label>Title</label>
+    <input id="title" placeholder="Meeting notes">
+
+    <label>Tag</label>
+    <input id="tag" placeholder="Work, Study, Personal">
+
+    <label>Content</label>
+    <textarea id="content" placeholder="Write your note..."></textarea>
+
+    <button class="primary" onclick="addNote()">Save Note</button>
+</div>
+
+<div class="card">
+    <h2>My Notes</h2>
+    <div id="notes"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+let filtered = [...notes];
+
+function addNote(){
+    const title=titleEl.value.trim();
+    const tag=tagEl.value.trim();
+    const content=contentEl.value.trim();
+
+    if(!title || !content){
+        alert("Title & content required");
+        return;
+    }
+
+    notes.unshift({
+        title,
+        tag,
+        content,
+        date:new Date().toLocaleString()
+    });
+
+    save();
+    clearForm();
+    render(notes);
+}
+
+function deleteNote(i){
+    notes.splice(i,1);
+    save();
+    render(notes);
+}
+
+function searchNotes(q){
+    q=q.toLowerCase();
+    filtered=notes.filter(n=>
+        n.title.toLowerCase().includes(q) ||
+        n.tag.toLowerCase().includes(q) ||
+        n.content.toLowerCase().includes(q)
+    );
+    render(filtered);
+}
+
+function render(list){
+    notesBox.innerHTML="";
+
+    if(list.length===0){
+        notesBox.innerHTML=`<div class="empty">No notes found</div>`;
+        return;
+    }
+
+    list.forEach((n,i)=>{
+        notesBox.innerHTML+=`
+        <div class="note">
+            <h4>${n.title}</h4>
+            <small>${n.tag} • ${n.date}</small>
+            <p>${n.content}</p>
+            <div class="note-actions">
+                <button class="danger" onclick="deleteNote(${i})">Delete</button>
+            </div>
+        </div>`;
+    });
+}
+
+function clearForm(){
+    titleEl.value="";
+    tagEl.value="";
+    contentEl.value="";
+}
+
+function save(){
+    localStorage.setItem("notes",JSON.stringify(notes));
+}
+
+const titleEl=document.getElementById("title");
+const tagEl=document.getElementById("tag");
+const contentEl=document.getElementById("content");
+const notesBox=document.getElementById("notes");
+
+render(notes);
+</script>
+
+</body>
+</html>
