@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TaskForge X – Enterprise Workflow Manager</title>
+
+<style>
+:root{
+    --primary:#0f172a;
+    --accent:#38bdf8;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --bg:#f8fafc;
+    --card:#ffffff;
+}
+
+*{box-sizing:border-box;font-family:Inter,Segoe UI,system-ui}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#e2e8f0,#f8fafc);
+    min-height:100vh;
+    padding:24px;
+}
+
+.app{max-width:1300px;margin:auto}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+header h1{margin:0;color:#020617}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:24px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.stat-value{
+    font-size:26px;
+    font-weight:800;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:24px;
+}
+
+.sidebar input,select{
+    width:100%;
+    padding:10px;
+    margin-bottom:14px;
+    border-radius:10px;
+    border:1px solid #cbd5e1;
+}
+
+button{
+    padding:12px;
+    width:100%;
+    border:none;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.primary{background:var(--accent);color:#020617}
+.danger{background:var(--danger);color:#fff}
+
+.workflow{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+
+.column{
+    background:#f1f5f9;
+    border-radius:18px;
+    padding:16px;
+}
+
+.column h3{text-align:center}
+
+.task{
+    background:#ffffff;
+    border-radius:14px;
+    padding:12px;
+    margin-bottom:10px;
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+    cursor:pointer;
+}
+
+.task small{display:block;color:#475569}
+
+.priority-high{border-left:6px solid #ef4444}
+.priority-mid{border-left:6px solid #facc15}
+.priority-low{border-left:6px solid #22c55e}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>🚀 TaskForge X</h1>
+    <strong>Enterprise Workflow Engine</strong>
+</header>
+
+<div class="stats">
+    <div class="card"><div>Total Tasks</div><div class="stat-value" id="total">0</div></div>
+    <div class="card"><div>Completed</div><div class="stat-value" id="done">0</div></div>
+    <div class="card"><div>In Progress</div><div class="stat-value" id="progress">0</div></div>
+    <div class="card"><div>Blocked</div><div class="stat-value" id="blocked">0</div></div>
+</div>
+
+<div class="board">
+
+<div class="card sidebar">
+    <h2>Create Task</h2>
+
+    <input id="title" placeholder="Task title">
+    <input id="owner" placeholder="Owner name">
+
+    <select id="priority">
+        <option value="high">High Priority</option>
+        <option value="mid">Medium Priority</option>
+        <option value="low">Low Priority</option>
+    </select>
+
+    <button class="primary" onclick="addTask()">Add Task</button>
+</div>
+
+<div class="card">
+    <h2>Workflow Board</h2>
+
+    <div class="workflow">
+        <div class="column"><h3>Backlog</h3><div id="backlog"></div></div>
+        <div class="column"><h3>In Progress</h3><div id="inprogress"></div></div>
+        <div class="column"><h3>Review</h3><div id="review"></div></div>
+        <div class="column"><h3>Completed</h3><div id="completed"></div></div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("taskforge")) || [];
+
+function addTask(){
+    if(!title.value || !owner.value) return alert("Fill all fields");
+
+    tasks.push({
+        title:title.value,
+        owner:owner.value,
+        priority:priority.value,
+        status:"backlog"
+    });
+
+    title.value="";
+    owner.value="";
+    save();
+    render();
+}
+
+function advance(i){
+    const flow=["backlog","inprogress","review","completed"];
+    let idx=flow.indexOf(tasks[i].status);
+    tasks[i].status=flow[Math.min(idx+1,flow.length-1)];
+    save();
+    render();
+}
+
+function render(){
+    backlog.innerHTML="";
+    inprogress.innerHTML="";
+    review.innerHTML="";
+    completed.innerHTML="";
+
+    let stats={total:tasks.length,done:0,progress:0,blocked:0};
+
+    tasks.forEach((t,i)=>{
+        if(t.status==="completed") stats.done++;
+        if(t.status==="inprogress") stats.progress++;
+        if(t.status==="review") stats.blocked++;
+
+        const el=document.createElement("div");
+        el.className=`task priority-${t.priority}`;
+        el.innerHTML=`<strong>${t.title}</strong>
+            <small>${t.owner}</small>
+            <small>Click to advance</small>`;
+
+        el.onclick=()=>advance(i);
+        document.getElementById(t.status).appendChild(el);
+    });
+
+    total.innerText=stats.total;
+    done.innerText=stats.done;
+    progress.innerText=stats.progress;
+    blocked.innerText=stats.blocked;
+}
+
+function save(){
+    localStorage.setItem("taskforge",JSON.stringify(tasks));
+}
+
+render();
+</script>
+
+</body>
+</html>
