@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>InsightIQ – SaaS Analytics Dashboard</title>
+
+<style>
+:root{
+    --primary:#020617;
+    --accent:#38bdf8;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --warning:#facc15;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+}
+
+*{box-sizing:border-box;font-family:Inter,Segoe UI,system-ui}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#e2e8f0,#f8fafc);
+    min-height:100vh;
+    padding:24px;
+}
+
+.app{max-width:1400px;margin:auto}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+header h1{margin:0;color:#020617}
+
+.filters{
+    display:flex;
+    gap:12px;
+}
+
+select{
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #cbd5e1;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.card{
+    background:var(--card);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.stat-title{color:#475569;font-size:14px}
+.stat-value{font-size:28px;font-weight:800}
+
+.grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.chart{
+    height:260px;
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+}
+
+.bar{
+    flex:1;
+    border-radius:10px 10px 0 0;
+    background:var(--accent);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    color:#020617;
+    font-weight:700;
+}
+
+.activity{
+    max-height:260px;
+    overflow:auto;
+}
+
+.log{
+    background:#f1f5f9;
+    border-radius:12px;
+    padding:10px;
+    margin-bottom:10px;
+}
+
+.log small{color:#475569}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h1>📊 InsightIQ</h1>
+    <div class="filters">
+        <select id="range" onchange="generateData()">
+            <option value="7">Last 7 Days</option>
+            <option value="14">Last 14 Days</option>
+            <option value="30">Last 30 Days</option>
+        </select>
+        <select id="metric" onchange="render()">
+            <option value="users">Users</option>
+            <option value="revenue">Revenue</option>
+            <option value="sessions">Sessions</option>
+        </select>
+    </div>
+</header>
+
+<div class="stats">
+    <div class="card">
+        <div class="stat-title">Active Users</div>
+        <div class="stat-value" id="users">0</div>
+    </div>
+    <div class="card">
+        <div class="stat-title">Revenue</div>
+        <div class="stat-value">₹<span id="revenue">0</span></div>
+    </div>
+    <div class="card">
+        <div class="stat-title">Sessions</div>
+        <div class="stat-value" id="sessions">0</div>
+    </div>
+    <div class="card">
+        <div class="stat-title">Conversion Rate</div>
+        <div class="stat-value" id="conversion">0%</div>
+    </div>
+</div>
+
+<div class="grid">
+
+<div class="card">
+    <h2>Performance Chart</h2>
+    <div class="chart" id="chart"></div>
+</div>
+
+<div class="card">
+    <h2>Recent Activity</h2>
+    <div class="activity" id="activity"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+let analytics = [];
+
+function generateData(){
+    const days = Number(range.value);
+    analytics = [];
+
+    for(let i=0;i<days;i++){
+        analytics.push({
+            users: Math.floor(Math.random()*500)+100,
+            revenue: Math.floor(Math.random()*20000)+5000,
+            sessions: Math.floor(Math.random()*1200)+300,
+            date: new Date(Date.now()-(days-i)*86400000).toDateString()
+        });
+    }
+    save();
+    render();
+}
+
+function render(){
+    const metric = metricEl.value;
+    chart.innerHTML="";
+    activity.innerHTML="";
+
+    let totalUsers=0,totalRevenue=0,totalSessions=0;
+
+    analytics.forEach(d=>{
+        totalUsers+=d.users;
+        totalRevenue+=d.revenue;
+        totalSessions+=d.sessions;
+
+        const bar=document.createElement("div");
+        bar.className="bar";
+        bar.style.height=(d[metric]/Math.max(...analytics.map(a=>a[metric]))*100)+"%";
+        bar.innerText=d[metric];
+        chart.appendChild(bar);
+
+        activity.innerHTML+=`
+            <div class="log">
+                <strong>${d.date}</strong><br>
+                <small>Users: ${d.users} | Revenue: ₹${d.revenue} | Sessions: ${d.sessions}</small>
+            </div>`;
+    });
+
+    users.innerText=totalUsers;
+    revenue.innerText=totalRevenue;
+    sessions.innerText=totalSessions;
+    conversion.innerText=((totalUsers/totalSessions)*100).toFixed(1)+"%";
+}
+
+function save(){
+    localStorage.setItem("analytics",JSON.stringify(analytics));
+}
+
+const range=document.getElementById("range");
+const metricEl=document.getElementById("metric");
+const chart=document.getElementById("chart");
+const activity=document.getElementById("activity");
+
+const users=document.getElementById("users");
+const revenue=document.getElementById("revenue");
+const sessions=document.getElementById("sessions");
+const conversion=document.getElementById("conversion");
+
+analytics = JSON.parse(localStorage.getItem("analytics")) || [];
+if(analytics.length===0) generateData();
+else render();
+</script>
+
+</body>
+</html>
