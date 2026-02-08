@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FlowBoard – Advanced Kanban System</title>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --panel:#020617;
+  --card:#111827;
+  --accent:#38bdf8;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --text:#e5e7eb;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui}
+body{margin:0;background:linear-gradient(135deg,#020617,#020617);color:var(--text);min-height:100vh}
+header{
+  padding:18px 28px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#020617;
+  border-bottom:1px solid #1e293b;
+}
+header h1{margin:0;font-size:22px}
+header button{
+  padding:10px 16px;
+  border-radius:10px;
+  border:none;
+  background:var(--accent);
+  font-weight:700;
+  cursor:pointer;
+}
+.board{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  padding:24px;
+}
+.column{
+  background:var(--panel);
+  border-radius:18px;
+  padding:16px;
+  min-height:520px;
+}
+.column h2{
+  margin:0 0 14px;
+  font-size:16px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.task{
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+  cursor:grab;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+.task strong{display:block}
+.task small{color:#94a3b8}
+.task button{
+  margin-top:10px;
+  background:transparent;
+  border:none;
+  color:var(--danger);
+  cursor:pointer;
+}
+.add-box{
+  margin-top:10px;
+  display:flex;
+  gap:8px;
+}
+.add-box input{
+  flex:1;
+  padding:8px;
+  border-radius:8px;
+  border:none;
+}
+.add-box button{
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  background:var(--success);
+  cursor:pointer;
+}
+.column.dragover{outline:2px dashed var(--accent)}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🧩 FlowBoard</h1>
+  <button onclick="resetBoard()">Reset Board</button>
+</header>
+
+<div class="board">
+  <div class="column" data-status="todo">
+    <h2>To Do</h2>
+    <div class="tasks"></div>
+    <div class="add-box">
+      <input placeholder="New task">
+      <button onclick="addTask(this,'todo')">+</button>
+    </div>
+  </div>
+
+  <div class="column" data-status="progress">
+    <h2>In Progress</h2>
+    <div class="tasks"></div>
+    <div class="add-box">
+      <input placeholder="New task">
+      <button onclick="addTask(this,'progress')">+</button>
+    </div>
+  </div>
+
+  <div class="column" data-status="done">
+    <h2>Completed</h2>
+    <div class="tasks"></div>
+    <div class="add-box">
+      <input placeholder="New task">
+      <button onclick="addTask(this,'done')">+</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("flowboard")) || [];
+
+function save(){
+  localStorage.setItem("flowboard",JSON.stringify(tasks));
+}
+
+function render(){
+  document.querySelectorAll(".tasks").forEach(t=>t.innerHTML="");
+  tasks.forEach(t=>{
+    const div=document.createElement("div");
+    div.className="task";
+    div.draggable=true;
+    div.dataset.id=t.id;
+    div.innerHTML=`
+      <strong>${t.title}</strong>
+      <small>${new Date(t.time).toLocaleString()}</small>
+      <button onclick="removeTask('${t.id}')">Delete</button>
+    `;
+    addDrag(div);
+    document.querySelector(`[data-status="${t.status}"] .tasks`).appendChild(div);
+  });
+}
+
+function addTask(btn,status){
+  const input=btn.previousElementSibling;
+  if(!input.value) return;
+  tasks.push({id:crypto.randomUUID(),title:input.value,status,time:Date.now()});
+  input.value="";
+  save(); render();
+}
+
+function removeTask(id){
+  tasks=tasks.filter(t=>t.id!==id);
+  save(); render();
+}
+
+function resetBoard(){
+  if(confirm("Clear all tasks?")){
+    tasks=[];
+    save(); render();
+  }
+}
+
+function addDrag(el){
+  el.addEventListener("dragstart",e=>{
+    e.dataTransfer.setData("id",el.dataset.id);
+  });
+}
+
+document.querySelectorAll(".column").forEach(col=>{
+  col.addEventListener("dragover",e=>{
+    e.preventDefault();
+    col.classList.add("dragover");
+  });
+  col.addEventListener("dragleave",()=>col.classList.remove("dragover"));
+  col.addEventListener("drop",e=>{
+    e.preventDefault();
+    col.classList.remove("dragover");
+    const id=e.dataTransfer.getData("id");
+    tasks.find(t=>t.id===id).status=col.dataset.status;
+    save(); render();
+  });
+});
+
+render();
+</script>
+
+</body>
+</html>
