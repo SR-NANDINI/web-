@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ExamCore – Online Examination System</title>
+
+<style>
+:root{
+  --bg:#020617;
+  --card:#020617;
+  --accent:#22c55e;
+  --danger:#ef4444;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui}
+body{
+  margin:0;
+  background:linear-gradient(135deg,#020617,#020617);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.container{
+  width:820px;
+  background:var(--card);
+  border-radius:22px;
+  padding:30px;
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+.timer{
+  background:#020617;
+  padding:10px 16px;
+  border-radius:14px;
+  font-weight:700;
+}
+.question{
+  font-size:20px;
+  margin-bottom:20px;
+}
+.option{
+  background:#020617;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:12px;
+  cursor:pointer;
+  border:1px solid transparent;
+}
+.option:hover{border-color:var(--accent)}
+.option.active{background:var(--accent);color:#020617;font-weight:700}
+.controls{
+  display:flex;
+  justify-content:space-between;
+  margin-top:24px;
+}
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+.next{background:var(--accent);color:#020617}
+.end{background:var(--danger);color:white}
+.result{
+  text-align:center;
+}
+.result h1{font-size:40px}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="exam">
+
+<header>
+  <h2>📝 ExamCore</h2>
+  <div class="timer" id="time">05:00</div>
+</header>
+
+<div id="quiz">
+  <div class="question" id="q"></div>
+  <div id="options"></div>
+</div>
+
+<div class="controls">
+  <button class="end" onclick="finish()">Finish Exam</button>
+  <button class="next" onclick="nextQ()">Next</button>
+</div>
+
+</div>
+
+<div class="container hidden" id="result">
+  <div class="result">
+    <h1 id="score"></h1>
+    <p id="remark"></p>
+    <button class="next" onclick="location.reload()">Restart</button>
+  </div>
+</div>
+
+<script>
+const questions=[
+ {q:"HTML stands for?",o:["Hyper Text Markup Language","Home Tool Markup","High Text Machine","Hyperlink Transfer"],a:0},
+ {q:"Which tag is used for CSS?",o:["<script>","<style>","<css>","<design>"],a:1},
+ {q:"LocalStorage belongs to?",o:["Server","Browser","Database","API"],a:1},
+ {q:"JS is?",o:["Compiled","Markup","Interpreted","Query"],a:2},
+ {q:"CSS Flexbox used for?",o:["Styling","Layouts","Scripts","Forms"],a:1}
+];
+
+let i=0,score=0,selected=null,time=300;
+
+function load(){
+  q.textContent=`Q${i+1}. ${questions[i].q}`;
+  options.innerHTML="";
+  selected=null;
+  questions[i].o.forEach((op,idx)=>{
+    const div=document.createElement("div");
+    div.className="option";
+    div.textContent=op;
+    div.onclick=()=>{
+      document.querySelectorAll(".option").forEach(o=>o.classList.remove("active"));
+      div.classList.add("active");
+      selected=idx;
+    };
+    options.appendChild(div);
+  });
+}
+
+function nextQ(){
+  if(selected===questions[i].a) score++;
+  i++;
+  if(i<questions.length) load();
+  else finish();
+}
+
+function finish(){
+  exam.classList.add("hidden");
+  result.classList.remove("hidden");
+  scoreEl=`${score}/${questions.length}`;
+  document.getElementById("score").textContent=scoreEl;
+  document.getElementById("remark").textContent=
+    score>=4?"Excellent Performance 🎯":score>=2?"Good Attempt 👍":"Needs Improvement ⚠️";
+}
+
+setInterval(()=>{
+  time--;
+  let m=String(Math.floor(time/60)).padStart(2,"0");
+  let s=String(time%60).padStart(2,"0");
+  timeEl=`${m}:${s}`;
+  timeDiv=document.getElementById("time");
+  timeDiv.textContent=timeEl;
+  if(time<=0) finish();
+},1000);
+
+load();
+</script>
+
+</body>
+</html>
