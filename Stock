@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TradeSim Pro – Stock Trading Simulator</title>
+
+<style>
+:root{
+  --bg:#020617;
+  --card:#020617;
+  --accent:#38bdf8;
+  --danger:#ef4444;
+  --success:#22c55e;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui}
+body{
+  margin:0;
+  background:linear-gradient(135deg,#020617,#020617);
+  color:var(--text);
+  min-height:100vh;
+}
+header{
+  padding:18px 28px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #1e293b;
+}
+header h1{margin:0}
+.wallet{
+  background:#020617;
+  padding:10px 16px;
+  border-radius:14px;
+  font-weight:700;
+}
+.container{
+  padding:24px;
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+}
+.market,.portfolio{
+  background:var(--card);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 30px 60px rgba(0,0,0,.5);
+}
+.market table{
+  width:100%;
+  border-collapse:collapse;
+}
+.market th,.market td{
+  padding:12px;
+  text-align:left;
+}
+.market tr:hover{background:#020617}
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+.buy{background:var(--success)}
+.sell{background:var(--danger);color:white}
+.portfolio-item{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>📈 TradeSim Pro</h1>
+  <div class="wallet">Balance: $<span id="bal">10000</span></div>
+</header>
+
+<div class="container">
+
+<div class="market">
+  <h2>Market</h2>
+  <table>
+    <tr><th>Stock</th><th>Price</th><th>Action</th></tr>
+    <tr>
+      <td>APL</td><td>$<span id="p1">120</span></td>
+      <td><button class="buy" onclick="buy('APL',120)">Buy</button></td>
+    </tr>
+    <tr>
+      <td>TES</td><td>$<span id="p2">200</span></td>
+      <td><button class="buy" onclick="buy('TES',200)">Buy</button></td>
+    </tr>
+    <tr>
+      <td>INF</td><td>$<span id="p3">90</span></td>
+      <td><button class="buy" onclick="buy('INF',90)">Buy</button></td>
+    </tr>
+  </table>
+</div>
+
+<div class="portfolio">
+  <h2>Your Portfolio</h2>
+  <div id="holdings"></div>
+</div>
+
+</div>
+
+<script>
+let balance=10000;
+let portfolio={};
+
+function updateUI(){
+  bal.textContent=balance;
+  holdings.innerHTML="";
+  for(let s in portfolio){
+    const div=document.createElement("div");
+    div.className="portfolio-item";
+    div.innerHTML=`${s} (${portfolio[s]}) 
+      <button class="sell" onclick="sell('${s}')">Sell</button>`;
+    holdings.appendChild(div);
+  }
+}
+
+function buy(stock,price){
+  if(balance<price) return alert("Insufficient funds");
+  balance-=price;
+  portfolio[stock]=(portfolio[stock]||0)+1;
+  updateUI();
+}
+
+function sell(stock){
+  if(portfolio[stock]>0){
+    portfolio[stock]--;
+    balance+=100;
+    if(portfolio[stock]==0) delete portfolio[stock];
+    updateUI();
+  }
+}
+
+updateUI();
+</script>
+
+</body>
+</html>
