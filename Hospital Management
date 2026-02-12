@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MedFlow – Hospital Management</title>
+
+<style>
+:root{
+ --bg:#020617;
+ --card:#020617;
+ --accent:#22c55e;
+ --danger:#ef4444;
+ --text:#e5e7eb;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui}
+body{margin:0;background:var(--bg);color:var(--text)}
+header{
+ padding:20px;
+ display:flex;
+ justify-content:space-between;
+ border-bottom:1px solid #1e293b;
+}
+.container{
+ padding:24px;
+ display:grid;
+ grid-template-columns:300px 1fr;
+ gap:20px;
+}
+.sidebar{
+ background:var(--card);
+ border-radius:20px;
+ padding:20px;
+}
+.sidebar button{
+ width:100%;
+ margin-bottom:10px;
+ padding:12px;
+ border:none;
+ border-radius:12px;
+ background:#020617;
+ color:var(--text);
+ cursor:pointer;
+}
+.main{
+ background:var(--card);
+ border-radius:20px;
+ padding:20px;
+}
+input,select{
+ width:100%;
+ padding:10px;
+ margin-bottom:10px;
+ border-radius:10px;
+ border:none;
+}
+table{
+ width:100%;
+ border-collapse:collapse;
+}
+th,td{padding:12px;text-align:left}
+tr:hover{background:#020617}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>🏥 MedFlow</h2>
+<p>Hospital Management System</p>
+</header>
+
+<div class="container">
+
+<div class="sidebar">
+<button onclick="show('patients')">Patients</button>
+<button onclick="show('appointments')">Appointments</button>
+<button onclick="show('doctors')">Doctors</button>
+</div>
+
+<div class="main" id="content"></div>
+
+</div>
+
+<script>
+let patients = JSON.parse(localStorage.getItem("patients")) || [];
+
+function save(){
+ localStorage.setItem("patients",JSON.stringify(patients));
+}
+
+function show(type){
+ if(type==="patients"){
+  content.innerHTML=`
+   <h3>Patients</h3>
+   <input placeholder="Name" id="name">
+   <input placeholder="Age" id="age">
+   <button onclick="add()">Add Patient</button>
+   <table>
+    ${patients.map(p=>`<tr><td>${p.name}</td><td>${p.age}</td></tr>`).join("")}
+   </table>
+  `;
+ }
+}
+
+function add(){
+ patients.push({name:name.value,age:age.value});
+ save();
+ show("patients");
+}
+
+show("patients");
+</script>
+
+</body>
+</html>
