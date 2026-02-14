@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>NexusChat – Professional Chat App</title>
+
+<style>
+*{
+box-sizing:border-box;
+font-family:Inter,system-ui;
+}
+
+body{
+margin:0;
+background:#0f172a;
+color:white;
+display:flex;
+height:100vh;
+}
+
+.sidebar{
+width:250px;
+background:#020617;
+padding:20px;
+border-right:1px solid #1e293b;
+}
+
+.sidebar h2{
+margin-bottom:20px;
+}
+
+.room{
+padding:10px;
+background:#1e293b;
+margin-bottom:10px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.room:hover{
+background:#334155;
+}
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.header{
+padding:15px;
+border-bottom:1px solid #1e293b;
+}
+
+.messages{
+flex:1;
+padding:20px;
+overflow-y:auto;
+}
+
+.message{
+margin-bottom:15px;
+background:#1e293b;
+padding:10px;
+border-radius:8px;
+}
+
+.meta{
+font-size:12px;
+color:#94a3b8;
+}
+
+.input-box{
+display:flex;
+padding:15px;
+border-top:1px solid #1e293b;
+}
+
+input{
+flex:1;
+padding:10px;
+border-radius:8px;
+border:none;
+}
+
+button{
+margin-left:10px;
+padding:10px 20px;
+border:none;
+background:#22c55e;
+color:white;
+border-radius:8px;
+cursor:pointer;
+}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+
+<h2>NexusChat</h2>
+
+<input id="username" placeholder="Your name">
+
+<input id="roomName" placeholder="New room">
+
+<button onclick="createRoom()">Create</button>
+
+<div id="rooms"></div>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+<h3 id="roomTitle">Select Room</h3>
+</div>
+
+<div class="messages" id="messages"></div>
+
+<div class="input-box">
+<input id="messageInput" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+</div>
+
+</div>
+
+<script>
+
+let rooms = JSON.parse(localStorage.getItem("rooms")) || {};
+let currentRoom = null;
+
+function save(){
+localStorage.setItem("rooms",JSON.stringify(rooms));
+}
+
+function renderRooms(){
+
+roomsDiv.innerHTML="";
+
+Object.keys(rooms).forEach(room=>{
+
+let div=document.createElement("div");
+div.className="room";
+div.innerText=room;
+div.onclick=()=>selectRoom(room);
+
+roomsDiv.appendChild(div);
+
+});
+
+}
+
+function createRoom(){
+
+let name=roomName.value;
+
+if(!name) return;
+
+if(!rooms[name]) rooms[name]=[];
+
+save();
+renderRooms();
+
+roomName.value="";
+}
+
+function selectRoom(name){
+
+currentRoom=name;
+roomTitle.innerText=name;
+renderMessages();
+}
+
+function renderMessages(){
+
+messages.innerHTML="";
+
+if(!currentRoom) return;
+
+rooms[currentRoom].forEach(msg=>{
+
+let div=document.createElement("div");
+div.className="message";
+
+div.innerHTML=`
+<b>${msg.user}</b>
+<div>${msg.text}</div>
+<div class="meta">${msg.time}</div>
+`;
+
+messages.appendChild(div);
+
+});
+
+}
+
+function sendMessage(){
+
+let user=username.value;
+let text=messageInput.value;
+
+if(!user || !text || !currentRoom) return;
+
+let time=new Date().toLocaleTimeString();
+
+rooms[currentRoom].push({
+user,text,time
+});
+
+save();
+renderMessages();
+
+messageInput.value="";
+}
+
+renderRooms();
+
+</script>
+
+</body>
+</html>
