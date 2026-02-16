@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>NeoBank – Digital Banking System</title>
+
+<style>
+*{
+box-sizing:border-box;
+font-family:Inter,system-ui;
+}
+
+body{
+margin:0;
+background:#020617;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.app{
+width:900px;
+background:#0f172a;
+border-radius:16px;
+overflow:hidden;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+.header{
+padding:20px;
+background:#020617;
+font-size:22px;
+font-weight:600;
+}
+
+.container{
+display:flex;
+}
+
+.sidebar{
+width:250px;
+background:#020617;
+padding:20px;
+}
+
+.sidebar button{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+border:none;
+border-radius:8px;
+background:#1e293b;
+color:white;
+cursor:pointer;
+}
+
+.main{
+flex:1;
+padding:20px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+margin-bottom:15px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:none;
+border-radius:8px;
+}
+
+button.action{
+padding:10px;
+border:none;
+background:#22c55e;
+color:white;
+border-radius:8px;
+cursor:pointer;
+width:100%;
+}
+
+.transaction{
+padding:10px;
+border-bottom:1px solid #334155;
+}
+
+.login{
+padding:30px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="header">
+NeoBank Digital Banking
+</div>
+
+<div id="loginPage" class="login">
+
+<h3>Login</h3>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button class="action" onclick="login()">Login</button>
+
+</div>
+
+<div id="dashboard" style="display:none">
+
+<div class="container">
+
+<div class="sidebar">
+
+<button onclick="show('balance')">Balance</button>
+<button onclick="show('deposit')">Deposit</button>
+<button onclick="show('withdraw')">Withdraw</button>
+<button onclick="show('history')">Transactions</button>
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<div class="main" id="content"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let userData = JSON.parse(localStorage.getItem("bankUser")) || {
+username:"admin",
+password:"1234",
+balance:10000,
+transactions:[]
+};
+
+let currentUser=null;
+
+function save(){
+localStorage.setItem("bankUser",JSON.stringify(userData));
+}
+
+function login(){
+
+let u=username.value;
+let p=password.value;
+
+if(u===userData.username && p===userData.password){
+
+currentUser=u;
+
+loginPage.style.display="none";
+dashboard.style.display="block";
+
+show("balance");
+
+}
+else{
+alert("Invalid login");
+}
+
+}
+
+function logout(){
+
+currentUser=null;
+
+dashboard.style.display="none";
+loginPage.style.display="block";
+
+}
+
+function show(page){
+
+if(page==="balance"){
+
+content.innerHTML=`
+<div class="card">
+<h3>Account Balance</h3>
+<h1>₹ ${userData.balance}</h1>
+</div>
+`;
+
+}
+
+if(page==="deposit"){
+
+content.innerHTML=`
+<div class="card">
+<h3>Deposit Money</h3>
+<input id="amount" placeholder="Amount">
+<button class="action" onclick="deposit()">Deposit</button>
+</div>
+`;
+
+}
+
+if(page==="withdraw"){
+
+content.innerHTML=`
+<div class="card">
+<h3>Withdraw Money</h3>
+<input id="amount" placeholder="Amount">
+<button class="action" onclick="withdraw()">Withdraw</button>
+</div>
+`;
+
+}
+
+if(page==="history"){
+
+content.innerHTML=`
+<div class="card">
+<h3>Transaction History</h3>
+${userData.transactions.map(t=>
+`<div class="transaction">${t.type} ₹${t.amount} - ${t.time}</div>`
+).join("")}
+</div>
+`;
+
+}
+
+}
+
+function deposit(){
+
+let amt=parseInt(amount.value);
+
+if(!amt) return;
+
+userData.balance+=amt;
+
+userData.transactions.push({
+type:"Deposit",
+amount:amt,
+time:new Date().toLocaleString()
+});
+
+save();
+
+show("balance");
+
+}
+
+function withdraw(){
+
+let amt=parseInt(amount.value);
+
+if(!amt) return;
+
+if(amt>userData.balance){
+
+alert("Insufficient balance");
+return;
+
+}
+
+userData.balance-=amt;
+
+userData.transactions.push({
+type:"Withdraw",
+amount:amt,
+time:new Date().toLocaleString()
+});
+
+save();
+
+show("balance");
+
+}
+
+</script>
+
+</body>
+</html>
