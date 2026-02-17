@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DevSpace IDE</title>
+
+<style>
+*{
+box-sizing:border-box;
+font-family:Consolas,monospace;
+}
+
+body{
+margin:0;
+background:#0f172a;
+color:white;
+display:flex;
+height:100vh;
+}
+
+.sidebar{
+width:250px;
+background:#020617;
+padding:10px;
+border-right:1px solid #1e293b;
+}
+
+.sidebar h3{
+margin-bottom:10px;
+}
+
+.file{
+padding:8px;
+background:#1e293b;
+margin-bottom:5px;
+cursor:pointer;
+border-radius:6px;
+}
+
+.file:hover{
+background:#334155;
+}
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.toolbar{
+padding:10px;
+background:#020617;
+border-bottom:1px solid #1e293b;
+}
+
+.toolbar button{
+padding:8px 15px;
+margin-right:5px;
+background:#22c55e;
+border:none;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.editor{
+flex:1;
+display:flex;
+}
+
+textarea{
+flex:1;
+background:#020617;
+color:#22c55e;
+border:none;
+padding:15px;
+font-size:14px;
+outline:none;
+}
+
+.preview{
+flex:1;
+background:white;
+}
+
+input{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+border:none;
+border-radius:6px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+
+<h3>DevSpace</h3>
+
+<input id="fileName" placeholder="newfile.html">
+
+<button onclick="createFile()">Create File</button>
+
+<div id="files"></div>
+
+</div>
+
+<div class="main">
+
+<div class="toolbar">
+
+<button onclick="run()">Run ▶</button>
+<button onclick="save()">Save 💾</button>
+
+</div>
+
+<div class="editor">
+
+<textarea id="code"></textarea>
+
+<iframe class="preview" id="preview"></iframe>
+
+</div>
+
+</div>
+
+<script>
+
+let files = JSON.parse(localStorage.getItem("ideFiles")) || {};
+let currentFile = null;
+
+function saveStorage(){
+localStorage.setItem("ideFiles",JSON.stringify(files));
+}
+
+function renderFiles(){
+
+filesDiv.innerHTML="";
+
+Object.keys(files).forEach(name=>{
+
+let div=document.createElement("div");
+
+div.className="file";
+div.innerText=name;
+
+div.onclick=()=>openFile(name);
+
+filesDiv.appendChild(div);
+
+});
+
+}
+
+function createFile(){
+
+let name=fileName.value;
+
+if(!name) return;
+
+files[name]="";
+
+saveStorage();
+renderFiles();
+
+fileName.value="";
+}
+
+function openFile(name){
+
+currentFile=name;
+code.value=files[name];
+}
+
+function save(){
+
+if(!currentFile) return;
+
+files[currentFile]=code.value;
+
+saveStorage();
+
+alert("Saved");
+}
+
+function run(){
+
+preview.srcdoc=code.value;
+
+}
+
+renderFiles();
+
+</script>
+
+</body>
+</html>
