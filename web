@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebOS X</title>
+
+<style>
+*{
+box-sizing:border-box;
+font-family:Inter,system-ui;
+}
+
+body{
+margin:0;
+background:#0f172a;
+height:100vh;
+overflow:hidden;
+color:white;
+}
+
+.desktop{
+width:100%;
+height:100%;
+position:relative;
+background:linear-gradient(135deg,#1e293b,#020617);
+}
+
+.icon{
+width:80px;
+text-align:center;
+cursor:pointer;
+margin:20px;
+}
+
+.icon img{
+width:50px;
+}
+
+.window{
+position:absolute;
+width:400px;
+height:300px;
+background:#020617;
+border-radius:10px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+display:none;
+flex-direction:column;
+}
+
+.titlebar{
+background:#1e293b;
+padding:8px;
+cursor:move;
+display:flex;
+justify-content:space-between;
+}
+
+.content{
+flex:1;
+padding:10px;
+overflow:auto;
+background:#0f172a;
+}
+
+.close{
+cursor:pointer;
+color:red;
+}
+
+.taskbar{
+position:absolute;
+bottom:0;
+width:100%;
+background:#020617;
+padding:10px;
+display:flex;
+gap:10px;
+}
+
+.task-btn{
+background:#1e293b;
+padding:5px 10px;
+border-radius:5px;
+cursor:pointer;
+}
+
+textarea{
+width:100%;
+height:100%;
+background:#020617;
+color:white;
+border:none;
+resize:none;
+}
+
+iframe{
+width:100%;
+height:100%;
+border:none;
+background:white;
+}
+</style>
+
+</head>
+<body>
+
+<div class="desktop">
+
+<div class="icon" onclick="openApp('notes')">
+📄 Notes
+</div>
+
+<div class="icon" onclick="openApp('files')">
+📁 Files
+</div>
+
+<div class="icon" onclick="openApp('browser')">
+🌐 Browser
+</div>
+
+<div class="window" id="notes">
+<div class="titlebar" onmousedown="dragStart(event,this.parentElement)">
+Notes
+<span class="close" onclick="closeApp('notes')">X</span>
+</div>
+<div class="content">
+<textarea id="noteArea"></textarea>
+</div>
+</div>
+
+<div class="window" id="files">
+<div class="titlebar" onmousedown="dragStart(event,this.parentElement)">
+File Manager
+<span class="close" onclick="closeApp('files')">X</span>
+</div>
+<div class="content">
+<p>Documents</p>
+<p>Images</p>
+<p>Projects</p>
+</div>
+</div>
+
+<div class="window" id="browser">
+<div class="titlebar" onmousedown="dragStart(event,this.parentElement)">
+Mini Browser
+<span class="close" onclick="closeApp('browser')">X</span>
+</div>
+<div class="content">
+<input id="url" placeholder="Enter URL">
+<button onclick="go()">Go</button>
+<iframe id="frame"></iframe>
+</div>
+</div>
+
+<div class="taskbar" id="taskbar"></div>
+
+</div>
+
+<script>
+
+let z=1;
+
+function openApp(id){
+let win=document.getElementById(id);
+win.style.display="flex";
+win.style.zIndex=++z;
+addTask(id);
+}
+
+function closeApp(id){
+document.getElementById(id).style.display="none";
+}
+
+function addTask(id){
+let btn=document.createElement("div");
+btn.className="task-btn";
+btn.innerText=id;
+btn.onclick=()=>openApp(id);
+taskbar.appendChild(btn);
+}
+
+function dragStart(e,win){
+let offsetX=e.clientX-win.offsetLeft;
+let offsetY=e.clientY-win.offsetTop;
+
+function move(ev){
+win.style.left=(ev.clientX-offsetX)+"px";
+win.style.top=(ev.clientY-offsetY)+"px";
+}
+
+document.addEventListener("mousemove",move);
+document.addEventListener("mouseup",()=>{
+document.removeEventListener("mousemove",move);
+});
+}
+
+function go(){
+let url=document.getElementById("url").value;
+if(!url.startsWith("http")) url="https://"+url;
+frame.src=url;
+}
+
+noteArea.value=localStorage.getItem("notes") || "";
+
+noteArea.addEventListener("input",()=>{
+localStorage.setItem("notes",noteArea.value);
+});
+
+</script>
+
+</body>
+</html>
