@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DocSpace – Professional Document Editor</title>
+
+<style>
+*{
+box-sizing:border-box;
+font-family:Inter,system-ui;
+}
+
+body{
+margin:0;
+background:#020617;
+color:white;
+display:flex;
+height:100vh;
+}
+
+.sidebar{
+width:260px;
+background:#020617;
+border-right:1px solid #1e293b;
+padding:15px;
+}
+
+.sidebar h2{
+margin-bottom:15px;
+}
+
+.doc{
+padding:10px;
+background:#1e293b;
+margin-bottom:8px;
+border-radius:8px;
+cursor:pointer;
+display:flex;
+justify-content:space-between;
+}
+
+.doc:hover{
+background:#334155;
+}
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.toolbar{
+padding:10px;
+background:#020617;
+border-bottom:1px solid #1e293b;
+}
+
+.toolbar button{
+padding:6px 12px;
+margin-right:5px;
+background:#22c55e;
+border:none;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.editor{
+flex:1;
+padding:20px;
+overflow:auto;
+}
+
+.editor[contenteditable]{
+outline:none;
+}
+
+input{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+border:none;
+border-radius:6px;
+}
+
+.delete{
+background:red;
+padding:3px 6px;
+border-radius:5px;
+cursor:pointer;
+}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+
+<h2>DocSpace</h2>
+
+<input id="docName" placeholder="New document name">
+
+<button onclick="createDoc()">Create Document</button>
+
+<div id="docList"></div>
+
+</div>
+
+<div class="main">
+
+<div class="toolbar">
+
+<button onclick="format('bold')">Bold</button>
+<button onclick="format('italic')">Italic</button>
+<button onclick="format('underline')">Underline</button>
+
+</div>
+
+<div class="editor" id="editor" contenteditable="true"></div>
+
+</div>
+
+<script>
+
+let docs = JSON.parse(localStorage.getItem("documents")) || {};
+let currentDoc=null;
+
+function save(){
+localStorage.setItem("documents",JSON.stringify(docs));
+}
+
+function renderDocs(){
+
+docList.innerHTML="";
+
+Object.keys(docs).forEach(name=>{
+
+let div=document.createElement("div");
+
+div.className="doc";
+
+div.innerHTML=`
+<span onclick="openDoc('${name}')">${name}</span>
+<span class="delete" onclick="deleteDoc('${name}')">X</span>
+`;
+
+docList.appendChild(div);
+
+});
+
+}
+
+function createDoc(){
+
+let name=docName.value;
+
+if(!name) return;
+
+docs[name]="";
+
+save();
+renderDocs();
+
+docName.value="";
+}
+
+function openDoc(name){
+
+currentDoc=name;
+
+editor.innerHTML=docs[name];
+
+}
+
+function deleteDoc(name){
+
+delete docs[name];
+
+save();
+renderDocs();
+
+editor.innerHTML="";
+
+}
+
+editor.addEventListener("input",()=>{
+
+if(currentDoc){
+
+docs[currentDoc]=editor.innerHTML;
+
+save();
+
+}
+
+});
+
+function format(type){
+
+document.execCommand(type);
+
+}
+
+renderDocs();
+
+</script>
+
+</body>
+</html>
