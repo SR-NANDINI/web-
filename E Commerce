@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ShopSphere – E-Commerce Platform</title>
+
+<style>
+*{
+box-sizing:border-box;
+font-family:Inter,system-ui;
+}
+
+body{
+margin:0;
+background:#020617;
+color:white;
+}
+
+header{
+padding:20px;
+background:#020617;
+border-bottom:1px solid #1e293b;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.container{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:#0f172a;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+}
+
+.product{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+button{
+padding:6px 12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+.add{
+background:#22c55e;
+color:white;
+}
+
+.remove{
+background:#ef4444;
+color:white;
+}
+
+.checkout{
+background:#38bdf8;
+color:white;
+width:100%;
+padding:10px;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+<body>
+
+<header>
+<h2>ShopSphere</h2>
+<h3>Cart: ₹ <span id="total"></span></h3>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Products</h3>
+
+<div id="products"></div>
+
+</div>
+
+<div>
+
+<div class="card">
+
+<h3>Your Cart</h3>
+
+<div id="cart"></div>
+
+<button class="checkout" onclick="checkout()">Checkout</button>
+
+</div>
+
+<div class="card">
+
+<h3>Orders</h3>
+
+<div id="orders"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let items = [
+{name:"Laptop",price:60000},
+{name:"Phone",price:30000},
+{name:"Headphones",price:5000},
+{name:"Smartwatch",price:10000}
+];
+
+let store = JSON.parse(localStorage.getItem("shopData")) || {
+cart:[],
+orders:[]
+};
+
+function save(){
+localStorage.setItem("shopData",JSON.stringify(store));
+}
+
+function renderProducts(){
+
+products.innerHTML="";
+
+items.forEach((item,i)=>{
+
+products.innerHTML+=`
+<div class="product">
+<span>${item.name} - ₹${item.price}</span>
+<button class="add" onclick="addToCart(${i})">Add</button>
+</div>
+`;
+
+});
+
+}
+
+function addToCart(i){
+
+store.cart.push(items[i]);
+
+save();
+update();
+
+}
+
+function removeFromCart(index){
+
+store.cart.splice(index,1);
+
+save();
+update();
+
+}
+
+function renderCart(){
+
+cart.innerHTML="";
+
+store.cart.forEach((item,i)=>{
+
+cart.innerHTML+=`
+<div class="product">
+<span>${item.name} - ₹${item.price}</span>
+<button class="remove" onclick="removeFromCart(${i})">Remove</button>
+</div>
+`;
+
+});
+
+}
+
+function renderOrders(){
+
+orders.innerHTML="";
+
+store.orders.forEach(order=>{
+
+orders.innerHTML+=`
+<div>
+Order ₹${order.total} - ${order.date}
+</div>
+`;
+
+});
+
+}
+
+function calculateTotal(){
+
+let sum=0;
+
+store.cart.forEach(item=>{
+sum+=item.price;
+});
+
+total.innerText=sum;
+
+return sum;
+
+}
+
+function checkout(){
+
+let totalAmount=calculateTotal();
+
+if(totalAmount===0){
+alert("Cart is empty");
+return;
+}
+
+store.orders.push({
+total:totalAmount,
+date:new Date().toLocaleString()
+});
+
+store.cart=[];
+
+save();
+update();
+
+alert("Order placed successfully");
+
+}
+
+function update(){
+
+renderProducts();
+renderCart();
+renderOrders();
+calculateTotal();
+
+}
+
+update();
+
+</script>
+
+</body>
+</html>
