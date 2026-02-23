@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LinkLite – URL Shortener</title>
+
+<style>
+body{
+font-family:Inter,system-ui;
+background:#020617;
+color:white;
+padding:40px;
+}
+
+.container{
+max-width:600px;
+margin:auto;
+background:#0f172a;
+padding:30px;
+border-radius:12px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:6px;
+border:none;
+}
+
+button{
+padding:10px 20px;
+background:#22c55e;
+border:none;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.result{
+margin-top:20px;
+background:#1e293b;
+padding:15px;
+border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>LinkLite – URL Shortener</h2>
+
+<input id="longUrl" placeholder="Enter long URL">
+
+<button onclick="shorten()">Generate Short URL</button>
+
+<div id="output"></div>
+
+</div>
+
+<script>
+
+let db = JSON.parse(localStorage.getItem("urlDB")) || {};
+
+function generateCode(length=6){
+let chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+let code="";
+for(let i=0;i<length;i++){
+code+=chars[Math.floor(Math.random()*chars.length)];
+}
+return code;
+}
+
+function shorten(){
+
+let url = longUrl.value;
+
+if(!url) return;
+
+let code = generateCode();
+
+while(db[code]){
+code = generateCode();
+}
+
+db[code]={
+url:url,
+clicks:0
+};
+
+localStorage.setItem("urlDB",JSON.stringify(db));
+
+output.innerHTML=`
+<div class="result">
+Short URL: <a href="#" onclick="redirectTo('${code}')">
+https://linklite/${code}
+</a>
+<br>
+Clicks: 0
+</div>
+`;
+
+}
+
+function redirectTo(code){
+
+db[code].clicks++;
+
+localStorage.setItem("urlDB",JSON.stringify(db));
+
+window.open(db[code].url,"_blank");
+
+}
+
+</script>
+
+</body>
+</html>
