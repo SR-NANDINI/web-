@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LRU Cache Simulator</title>
+
+<style>
+body{
+font-family:Inter,system-ui;
+background:#020617;
+color:white;
+padding:40px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:#0f172a;
+padding:30px;
+border-radius:12px;
+}
+
+input{
+padding:8px;
+margin-right:5px;
+border-radius:6px;
+border:none;
+}
+
+button{
+padding:8px 12px;
+background:#22c55e;
+border:none;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.cache-box{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+.item{
+padding:10px 15px;
+background:#1e293b;
+border-radius:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>LRU Cache Visualizer</h2>
+
+Capacity:
+<input id="capacity" value="3">
+
+<br><br>
+
+Key:
+<input id="keyInput">
+
+Value:
+<input id="valueInput">
+
+<button onclick="put()">PUT</button>
+<button onclick="get()">GET</button>
+
+<div class="cache-box" id="cacheView"></div>
+
+</div>
+
+<script>
+
+let cap = 3;
+let cache = new Map();
+
+function updateView(){
+
+cacheView.innerHTML="";
+
+Array.from(cache.keys()).reverse().forEach(key=>{
+
+let div=document.createElement("div");
+div.className="item";
+div.innerText=key+" : "+cache.get(key);
+
+cacheView.appendChild(div);
+
+});
+
+}
+
+function put(){
+
+cap=parseInt(capacity.value);
+
+let key=keyInput.value;
+let value=valueInput.value;
+
+if(!key) return;
+
+if(cache.has(key)){
+cache.delete(key);
+}
+else if(cache.size>=cap){
+let firstKey=cache.keys().next().value;
+cache.delete(firstKey);
+}
+
+cache.set(key,value);
+
+updateView();
+
+}
+
+function get(){
+
+let key=keyInput.value;
+
+if(!cache.has(key)){
+alert("Not Found");
+return;
+}
+
+let value=cache.get(key);
+
+cache.delete(key);
+cache.set(key,value);
+
+updateView();
+
+alert("Value: "+value);
+
+}
+
+updateView();
+
+</script>
+
+</body>
+</html>
